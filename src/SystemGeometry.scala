@@ -95,14 +95,14 @@ object SystemGeometry
     {
 		if ((applyConstraints(v dot diffV(v), Rules._1, Rules._2, Rules._3) == Num(0.0)) && (applyConstraints(v dot diffV(v), Rules._1, Rules._2, Rules._3) == Num(0.0)))
 		{
-			g_veom += (diffV(v) -> Cross(Vec("omega" + printVTree(v).replaceFirst("q","")),v))
+			g_veom += (diffV(v) -> Cross(Vec("omega" + printVLatex(v).replaceFirst("q","")),v))
 		}
 	}	
 	
 	var matrices = configVars._3
     for (m <- matrices)
     {
-        g_meom += (MMul(m,SkewMat("omega" + printMTree(m).replaceFirst("R",""))) -> diffM(m))
+        g_meom += (MMul(m,SkewMat("omega" + printMLatex(m).replaceFirst("R",""))) -> diffM(m))
 	}
 	
 	var geometrical_eoms = Tuple3(g_seom, g_veom, g_meom)

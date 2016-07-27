@@ -87,7 +87,7 @@ object DynamicalModelComputation
     {
 		var geom = Add(Mul(keyVal._1,Num(-1.0)),keyVal._2)
 		s_eom = s_eom :+ geom
-    	println("Geo: " + printTree(geom) + " = 0")
+    	println("Geo: " + printLatex(geom) + " = 0")
 	}
 
 	var v_eom = eom._3
@@ -95,7 +95,7 @@ object DynamicalModelComputation
     {
 		var geom = VAdd(SMul(keyVal._1,Num(-1.0)),keyVal._2)
 		v_eom = v_eom :+ geom
-    	println("Geo: " + printVTree(geom) + " = 0")
+    	println("Geo: " + printVLatex(geom) + " = 0")
 	}
 	
 	var m_eom:List[MExp] = List()
@@ -103,7 +103,7 @@ object DynamicalModelComputation
     {
 		var geom = MAdd(SMMul(keyVal._1,Num(-1.0)),keyVal._2)
 		m_eom = m_eom :+ geom
-    	println("Geo: " + printMTree(geom) + " = 0")
+    	println("Geo: " + printMLatex(geom) + " = 0")
 	}
 	
     val endTime = System.nanoTime()
