@@ -19,9 +19,7 @@ Below are the steps for downloading scala and setting up your computational envi
 
 3. Open command prompt (windows) or terminal (mac/ubuntu). Type scala while in the DynamicalModeling directory. If the scala interpreter does not initialize, you must set environmental variables properly. http://www.scala-lang.org/download/install.html. Otherwise you can access the interpreter via $INSTALLATION_PATH$/bin/scala.
 
-4. Build dynamics_on_manifolds package. (If still in scala, exit out. The next line is in shell.)
-
- (“$>" marks interpreter prompt)
+4. Build dynamics_on_manifolds package. (If still in scala, exit out. The next line is in shell.) `(“$>" marks interpreter prompt)`
  ```
  $> scalac -cp . mechanical_systems/*.scala src/*.scala
  ```
