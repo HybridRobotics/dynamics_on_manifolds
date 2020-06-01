@@ -1,3 +1,11 @@
-dynamics_on_manifolds/*
-project/*
-target/*
+# IntelliJ IDEA
+.idea
+out/
+
+# sbt specific
+target/
+project/target
+
+# Scala
+*.class
+*.log
