@@ -11,26 +11,24 @@ import SystemGeometry._
 import Variation._
 object DynamicalModelComputation
 {
-
-
   def computeEquationsOfMotion( Lagrangian:Exp, infWork:Exp, configVars:Tuple3[List[Exp],List[VExp],List[MExp]]) : Tuple3[List[Exp],List[VExp],List[MExp]] =
   {
     val startTime = System.nanoTime() // track computation time
 
     // Convert Input Tree to Desired Format (terms expanded and combined numeric constants)
     var L = simp(Lagrangian)
-	L = expansion(L)
+	  L = expansion(L)
     L = simplify(L)
 
-	// Step 0: Generate Collection Terms and Constraints of the Configuration Manifold
+    // Step 0: Generate Collection Terms and Constraints of the Configuration Manifold
     // Check for Geometry Dependent Equations of Motion
     var colTerms = generateCollectionTerms(configVars)
     var Rules = generateRules(configVars,colTerms)
-	var geometric_eom = checkGeometry(configVars, Rules)
-	var rules2 = Rules._2
-	// for (keyVal <- geometric_eom._2) {rules2 += keyVal}
-	var rules3 = Rules._3
-	// for (keyVal <- geometric_eom._3) {rules3 += keyVal}
+	  var geometric_eom = checkGeometry(configVars, Rules)
+	  var rules2 = Rules._2
+	  // for (keyVal <- geometric_eom._2) {rules2 += keyVal}
+	  var rules3 = Rules._3
+	  // for (keyVal <- geometric_eom._3) {rules3 += keyVal}
 
     // Step 1 in the readme Diagram has already been completed (lagrangian provided)
 
@@ -75,39 +73,43 @@ object DynamicalModelComputation
 
     // Step 6 and 7: Collect for each term and extract the equations of motion.
     var eom:Tuple3[String,List[Exp],List[VExp]] = printEOM(dL,scalars,vectors)
-	println(eom._1)
+	  println(eom._1)
 
-	// Consolidate geometrical dependent and variation dependent equations of motion.
+  	// Consolidate geometrical dependent and variation dependent equations of motion.
 
-	var s_eom = eom._2
-	for (keyVal <- geometric_eom._1)
+  	var s_eom = eom._2
+	  for (keyVal <- geometric_eom._1)
     {
-		var geom = Add(Mul(keyVal._1,Num(-1.0)),keyVal._2)
-		s_eom = s_eom :+ geom
+		  var geom = Add(Mul(keyVal._1,Num(-1.0)),keyVal._2)
+		  s_eom = s_eom :+ geom
     	println("Geo: " + printLatex(geom) + " = 0")
-	}
+  	}
 
-	var v_eom = eom._3
-	for (keyVal <- geometric_eom._2)
+	  var v_eom = eom._3
+	  for (keyVal <- geometric_eom._2)
     {
-		var geom = VAdd(SMul(keyVal._1,Num(-1.0)),keyVal._2)
-		v_eom = v_eom :+ geom
+		  var geom = VAdd(SMul(keyVal._1,Num(-1.0)),keyVal._2)
+		  v_eom = v_eom :+ geom
     	println("Geo: " + printVLatex(geom) + " = 0")
-	}
+  	}
 
-	var m_eom:List[MExp] = List()
-	for (keyVal <- geometric_eom._3)
+	  var m_eom:List[MExp] = List()
+	  for (keyVal <- geometric_eom._3)
     {
-		var geom = MAdd(SMMul(keyVal._1,Num(-1.0)),keyVal._2)
-		m_eom = m_eom :+ geom
+		  var geom = MAdd(SMMul(keyVal._1,Num(-1.0)),keyVal._2)
+		  m_eom = m_eom :+ geom
     	println("Geo: " + printMLatex(geom) + " = 0")
-	}
+  	}
 
     val endTime = System.nanoTime()
     println("ComputationTime:" + (endTime - startTime)/1000000)
 
 
-	return Tuple3(s_eom,v_eom, m_eom)
+	  return Tuple3(s_eom,v_eom, m_eom)
+  }
+
+  // Variation based linearization
+  def performVariationLinearization(): Unit = {
 
   }
 }

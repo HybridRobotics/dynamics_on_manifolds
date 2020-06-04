@@ -17,7 +17,7 @@ object Pendulum3D
       val e3    = CVec(  "e3") // direction of gravitational field
       val rho   = CVec( "rho") // vector, points to point mass with respect to R
       val eta   = Vec(  "eta") // generalized vector to describe variation on SO(3)
-      val omega = Vec("omega") // (d/dt)R = R*omega
+      val omega = Vec("Omega") // (d/dt)R = R*omega
 
       // matrices
       val eta_skew  = SkewMat("eta") // skew matrix of generalized vector eta

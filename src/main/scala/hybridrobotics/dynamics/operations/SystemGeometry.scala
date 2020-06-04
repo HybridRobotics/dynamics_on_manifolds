@@ -28,7 +28,7 @@ object SystemGeometry
 
     def getOmega(m:MExp) : VExp = m match
     {
-        case Mat(s) => Vec(s.replace("R","omega"))
+        case Mat(s) => Vec(s.replace("R","Omega"))
         case m:MExp => Vec("None")
     }
 
@@ -68,7 +68,17 @@ object SystemGeometry
         {
             if (v.isInstanceOf[UnitVector])
             {
+                /* Adding the variation rules for unit vectors
+                    q.\delta q  = q dot cross(xi,q) = 0
+                    q.\dot{q}   = q dot cross(omega, q) = 0
+                    xi.q = 0
+                */
                 rules1 += (Dot(v,deltaV(v)) -> Num(0), Dot(v,diffV(v)) -> Num(0), Dot(getXi(v),v) -> Num(0))
+
+                /* Adding unit vector relation to its varation
+                    \delta q = cross(xi, q)
+                    \delta\dot q = cross(\dot \xi,q)+cross(xi, \dot q)
+                 */
                 rules2 += (deltaV(v) -> Cross(getXi(v),v), deltaV(diffV(v)) -> VAdd(Cross(diffV(getXi(v)),v),Cross(getXi(v),diffV(v))))
             }
         }

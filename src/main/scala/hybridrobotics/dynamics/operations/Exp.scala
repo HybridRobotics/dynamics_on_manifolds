@@ -19,7 +19,7 @@ class Exp
 case class deltaS( u:Exp )     extends Exp  // delta prefix
 case class Num( n:Double )     extends Exp // wrap double
 case class Var( s:String )     extends Exp // wrap String
-case class Cons( s:String )     extends Exp // wrap String (Constant)
+case class Cons( s:String )    extends Exp // wrap String (Constant)
 case class Par( u:Exp )        extends Exp // parentheses
 case class Mul( u:Exp, v:Exp ) extends Exp // u * v infix
 case class Add( u:Exp, v:Exp ) extends Exp // u + v infix

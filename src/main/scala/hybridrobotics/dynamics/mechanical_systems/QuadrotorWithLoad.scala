@@ -47,5 +47,5 @@ object QuadrotorWithLoad
     val infWork = (eta1 dot M1) + ((deltaV(x2) - (deltaV(q2) * l2)) dot (f ** (R ** e3)))
 
     computeEquationsOfMotion(L, infWork, configVars)
-    }
+  }
 }
