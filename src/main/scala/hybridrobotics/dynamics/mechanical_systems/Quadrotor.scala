@@ -1,5 +1,7 @@
 package hybridrobotics.dynamics.mechanical_systems
 
+import java.io.{File, PrintWriter}
+
 import hybridrobotics.dynamics.operations.Differentiation.diffV
 import hybridrobotics.dynamics.operations.DynamicalModelComputation.computeEquationsOfMotion
 import hybridrobotics.dynamics.operations._
@@ -14,7 +16,7 @@ object Quadrotor {
     val J = CSMat("J")
 
     // define constant vectors
-    val e3     = CVec("e3")
+    val e3     = CVec("e_3")
 
     // defining states
     val x = Vec("x")
@@ -43,8 +45,17 @@ object Quadrotor {
     // define infinitesimal work)
     val infWork = (M dot eta) + (deltaV(x) dot (R**e3*f))
 
-    computeEquationsOfMotion(L, infWork, configVars)
+    val eoms = computeEquationsOfMotion(L, infWork, configVars)
+    println(s"Done: $eoms")
 
+    // Generate txt file with latex equations
+    val eom_latex = eoms._1
+    val FILE_PATH = new java.io.File(".").getCanonicalPath
+    val writer = new PrintWriter(new File(FILE_PATH + """\output\Quadrotor.tex""" ))
+    for (str <- eom_latex) {
+      writer.write(str)
+    }
+    writer.close()
   }
 
 }

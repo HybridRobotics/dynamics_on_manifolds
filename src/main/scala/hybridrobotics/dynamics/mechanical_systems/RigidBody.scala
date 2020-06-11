@@ -1,5 +1,7 @@
 package hybridrobotics.dynamics.mechanical_systems
 
+import java.io._
+
 import hybridrobotics.dynamics.operations.Differentiation.diffV
 import hybridrobotics.dynamics.operations.DynamicalModelComputation.computeEquationsOfMotion
 import hybridrobotics.dynamics.operations._
@@ -38,12 +40,27 @@ object RigidBody {
     val PE = m*g*Dot(x, e3)
 
     // Lagrangian
-    var L = KE - PE
+    val L = KE - PE
 
     // define infinitesimal work)
     val infWork = (M dot eta) + (deltaV(x) dot F)
 
-    computeEquationsOfMotion(L, infWork, configVars)
+    // solve for equations of motion
+    val eoms = computeEquationsOfMotion(L, infWork, configVars)
+    println(s"Done: $eoms")
+
+    // Generate txt file with latex equations
+    val eom_latex = eoms._1
+    val FILE_PATH = new java.io.File(".").getCanonicalPath
+    val writer = new PrintWriter(new File(FILE_PATH + """\output\RigidBody.tex""" ))
+    for (str <- eom_latex) {
+      writer.write(str)
+    }
+    writer.close()
+
+    // functionality to generate Matlab function
+
+
   }
 
 }

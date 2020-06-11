@@ -1,5 +1,7 @@
 package hybridrobotics.dynamics.mechanical_systems
 
+import java.io.{File, PrintWriter}
+
 import hybridrobotics.dynamics.operations.DynamicalModelComputation.computeEquationsOfMotion
 import hybridrobotics.dynamics.operations._
 
@@ -37,8 +39,17 @@ object Pendulum3D
       val M = Vec("M")
       val infWork = eta dot M
 
-      var eoms = computeEquationsOfMotion(L, infWork, configVars)
+      val eoms = computeEquationsOfMotion(L, infWork, configVars)
+      println(s"Done: $eoms")
 
+      // Generate txt file with latex equations
+      val eom_latex = eoms._1
+      val FILE_PATH = new java.io.File(".").getCanonicalPath
+      val writer = new PrintWriter(new File(FILE_PATH + """\output\Pendulum3D.tex""" ))
+      for (str <- eom_latex) {
+          writer.write(str)
+      }
+      writer.close()
   }
 
 }

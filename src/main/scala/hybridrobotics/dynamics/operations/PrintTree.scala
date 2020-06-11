@@ -35,7 +35,7 @@ object PrintLine
     case SMat(s)  => checkSymbols(s)
     case CSMat(s)  => checkSymbols(s)
     case CMat(s)  => checkSymbols(s)
-    case SkewMat(s)  => checkSymbols(s)
+    case SkewMat(s)  => "\\hatmap{" + checkSymbols(s) + "}"
     case MMul(s,r)  => printMLatex(s) + " " + printMLatex(r)
     case deltaM(s)  => "\\delta " + printMLatex(s) 
     case transpose(s)  => printMLatex(s) + "^{T}" 
@@ -52,21 +52,21 @@ object PrintLine
     case Cross(u,v) => printVLatex(u) + "\\times " + printVLatex(v)
     case SMul(u,v) => printVLatex(u) + " " + printLatex(v) 
     case VMul(u,v) => printMLatex(u) + " " + printVLatex(v) 
-	case ZVec(s) => checkSymbols(s)
+	  case ZVec(s) => checkSymbols(s)
   }
 
   // Print Scalar to Screen
   def printLatex( e:Exp ) : String = e match
   {
-    case deltaS(u) => "\\delta" +"(" + printLatex(u) + ")"
-    case Var(s) => checkSymbols(s)
-    case Cons(s) => checkSymbols(s)
-    case Num(d) => d.toString
-    case Add(u,v) => printLatex(u) + "+" + printLatex(v)
+    case deltaS(u)  => "\\delta" +"(" + printLatex(u) + ")"
+    case Var(s)     => checkSymbols(s)
+    case Cons(s)    => checkSymbols(s)
+    case Num(d)     => "(" + d.toString + ")"
+    case Add(u,v)   => printLatex(u) + "+" + printLatex(v)
     case Mul(deltaS(u),v) => printLatex(deltaS(u)) + "* (" + printLatex(v) + ")"
-    case Mul(u,v) => printLatex(u) + " " + printLatex(v)
-    case Dot(u,v) => printVLatex(u) + "\\cdot " + printVLatex(v)
-    case Par(u)   => "(" + printLatex(u) + ")" 
+    case Mul(u,v)   => printLatex(u) + " " + printLatex(v)
+    case Dot(u,v)   => printVLatex(u) + "\\cdot " + printVLatex(v)
+    case Par(u)     => "(" + printLatex(u) + ")"
   }
     
   // Print Matrix to Screen
@@ -95,7 +95,7 @@ object PrintLine
     case Cross(u,v) => printVTree(u) + "x" + printVTree(v)
     case SMul(u,v) => printVTree(u) + "*" + printTree(v) 
     case VMul(u,v) => printMTree(u) + "*" + printVTree(v) 
-	case ZVec(s) => s
+	  case ZVec(s) => s
   }
 
   // Print Scalar to Screen
@@ -114,41 +114,41 @@ object PrintLine
 
 
   // Prints set of Equations of Motion
-  def printEOM( e:Exp, s:List[Exp], v:List[VExp] ) : Tuple3[String,List[Exp],List[VExp]] =
+  def printEOM( e:Exp, s:List[Exp], v:List[VExp] ) : Tuple3[List[String], List[Exp], List[VExp]] =
   {
-    var eom = "Equations of Motion:"
+    var eom_latex:List[String] = List()
     var piece:Exp = Num(0)
     var counter:Int = 0
-	var eom_s:List[Exp] = List()
-	var eom_v:List[VExp] = List()
+    var eom_scalar:List[Exp] = List()
+    var eom_vector:List[VExp] = List()
     
     // Extracts one equation for each collection term
     for ( scalar <- s)
     {
-        piece = colScalar(e,scalar)
-        piece = separate(piece, scalar)
-        val line = simplify(piece)
-        val finalOutput = removeOneCoefs(line)
-        eom = eom + "\nLag" + (counter+1).toString + ": " + printLatex(finalOutput) + " = 0"
-        eom_s = eom_s :+ finalOutput
-        counter = counter + 1
+      piece = colScalar(e,scalar)
+      piece = separate(piece, scalar)
+      val line = simplify(piece)
+      val finalOutput = removeOneCoefs(line)
+      eom_latex = eom_latex :+ "Lag" + (counter+1).toString + ":$" + printLatex(finalOutput) + " = 0$"
+      eom_scalar = eom_scalar :+ finalOutput
+      counter = counter + 1
     }
     
     // Extracts one equation for each collection term
     for ( vector <- v)
     {
-        piece = col(e,vector)
-        piece = separateV(piece, vector)
-        val prep = simplify(piece)
-        
-        val line = extractAll(prep)
-        
-        val finalOutput = removeOneCoefsV(line)
-        eom = eom + "\nLag" + (counter+1).toString + ": " + printVLatex(finalOutput) + " = 0"
-        eom_v = eom_v :+ finalOutput
-        counter = counter + 1
+      piece = col(e,vector)
+      piece = separateV(piece, vector)
+      val prep = simplify(piece)
+
+      val line = extractAll(prep)
+
+      val finalOutput = removeOneCoefsV(line)
+      eom_latex = eom_latex :+ "Lag" + (counter+1).toString + ": $" + printVLatex(finalOutput) + " = 0$"
+      eom_vector = eom_vector :+ finalOutput
+      counter = counter + 1
     }
-    return Tuple3(eom,eom_s,eom_v)
+    return Tuple3(eom_latex, eom_scalar, eom_vector)
   }
 
 }
