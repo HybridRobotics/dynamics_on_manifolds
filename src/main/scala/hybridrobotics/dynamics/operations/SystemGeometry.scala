@@ -1,21 +1,32 @@
 package hybridrobotics.dynamics.operations
 
-import ApplyRules._
-import Differentiation._
-import PrintLine._
-import Variation._
+import hybridrobotics.dynamics.operations.ApplyRules._
+import hybridrobotics.dynamics.operations.Differentiation._
+import hybridrobotics.dynamics.operations.PrintLine._
 
 object SystemGeometry {
 
-//  def HatMap(v: VExp): Unit = {
-//    e: match = e {}
-////    println(s""+v.s+"")
-//    println("Debug")
-//  }
-
-  def VeeMap(m: MExp): Unit = {
-
+  def HatMap(v: Any): MExp = v match {
+    case v: String => SkewMat(v)
+    case v: Vec => SkewMat(v.s)
+    case v: UVec => SkewMat(v.s)
+    case v: ZVec => SkewMat(v.s)
+    case v: AVec => SkewMat(v.s)
+    case SkewMatVec(m) => SkewMat(m)
   }
+
+  def VeeMap(m: Any): VExp = m match {
+    case m: String => SkewMatVec(m)
+    case m: Mat => SkewMatVec(m.s)
+    case m: SMat => SkewMatVec(m.s)
+    case m: CSMat => SkewMatVec(m.s)
+    case m: CMat => SkewMatVec(m.s)
+    case SkewMat(s) => Vec(s)
+  }
+
+  //  def VeeMap(m: MExp): VExp = {
+  //    val v
+  //  }
 
   def getXi(v: VExp): VExp = v match {
     case UVec(s) => Vec(s.replace("q", "xi"))

@@ -5,6 +5,7 @@ import java.io.{File, PrintWriter}
 import hybridrobotics.dynamics.operations.Differentiation.diffV
 import hybridrobotics.dynamics.operations.DynamicalModelComputation.computeEquationsOfMotion
 import hybridrobotics.dynamics.operations._
+import hybridrobotics.dynamics.operations.PrintLine.print2LatexFile
 
 object PointMass {
 
@@ -33,16 +34,7 @@ object PointMass {
     val infWork = Dot(deltaV(x),u)
 
     val eoms = computeEquationsOfMotion(L, infWork, configVars)
-    println(s"Done: $eoms")
-
-    // Generate txt file with latex equations
-    val eom_latex = eoms._1
-    val FILE_PATH = new java.io.File(".").getCanonicalPath
-    val writer = new PrintWriter(new File(FILE_PATH + """\output\PointMass.tex""" ))
-    for (str <- eom_latex) {
-      writer.write(str)
-    }
-    writer.close()
+    print2LatexFile(eoms._1, "PointMass")
 
   }
 

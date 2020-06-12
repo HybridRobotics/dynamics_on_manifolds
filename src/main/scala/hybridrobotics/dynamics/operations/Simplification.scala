@@ -209,7 +209,7 @@ object Simplification {
 
   def simpV(e: VExp): VExp = e match {
     // Will remove zeros.
-    case VAdd(vector1, SMul(vector2, Num(scalar1))) => if (scalar1 == 0 ) {
+    case VAdd(vector1, SMul(vector2, Num(scalar1))) => if (scalar1 == 0) {
       simpV(vector1)
     } else {
       VAdd(simpV(vector1), SMul(simpV(vector2), simp(Num(scalar1))))

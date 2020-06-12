@@ -31,9 +31,9 @@ object Cancellation
   {
     var simpTerms:List[Exp] = List()
     var nc = consts
-    for ( i  <- 0 to (terms.length-1))
+    for ( i  <- terms.indices)
     {
-      for (j <- i+1 to (terms.length-1))
+      for (j <- i + 1 until terms.length)
       {
         if (terms(i) == terms(j))
         {
@@ -42,7 +42,7 @@ object Cancellation
         }
       }
     }
-    for ( i  <- 0 to (terms.length-1))
+    for ( i  <- terms.indices)
     {
       simpTerms = simpTerms :+ Mul(nc(i),terms(i))
     }

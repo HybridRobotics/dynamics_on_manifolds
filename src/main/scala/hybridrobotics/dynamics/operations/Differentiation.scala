@@ -2,10 +2,11 @@ package hybridrobotics.dynamics.operations
 
 object Differentiation {
 
-  def diff (e:Any) : Any = e match {
+  def diff(e: Any): Any = e match {
     case e: Exp => diffS(e)
     case e: VExp => diffV(e)
     case e: SO3 => e.getDiff
+    case e: S2 => e.getDiff
     case e: MExp => diffM(e)
   }
 
@@ -25,6 +26,7 @@ object Differentiation {
     case SkewMat(s) => Mat(s + "dot")
     case deltaM(m: MExp) => deltaM(diffM(m))
     case transpose(m: MExp) => transpose(diffM(m))
+    case SO3(s) => Mat(s+"dot")
   }
 
   def diffV(v: VExp): VExp = v match {
@@ -39,6 +41,7 @@ object Differentiation {
     }
     case deltaV(v: VExp) => deltaV(diffV(v))
     case AVec(s, u) => AVec(s + "dot", diffV(u))
+    case S2(s) => Vec(s+"dot")
   }
 
   def diffS(e: Exp): Exp = e match {

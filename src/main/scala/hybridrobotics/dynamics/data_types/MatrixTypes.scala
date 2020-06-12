@@ -1,5 +1,5 @@
 // MatrixTypes.scala
-package hybridrobotics.dynamics.operations
+package hybridrobotics.dynamics.data_types
 
 trait SymmetricMatrix {}
 
@@ -9,4 +9,3 @@ trait SkewSymmetricMatrix {}
 
 trait Unimodular {}
 
-trait SpecialEuclidean {}

@@ -3,16 +3,25 @@ package hybridrobotics.dynamics.operations
 
 class MExp {
   //Wrap s:String to MExp
+
   import language.implicitConversions
+
   implicit def str2MExp(s: String, t: String): MExp = Mat(s)
 
   //Infix operators
   def *(u: Exp): MExp = SMMul(this, u)
+
   def **(v: VExp): VExp = VMul(this, v)
+
   def ***(m: MExp): MExp = MMul(this, m)
+
   def +(m: MExp): MExp = MAdd(this, m)
+
   def -(m: MExp): MExp = MAdd(this, SMMul(m, Num(-1)))
+
   def detm: Exp = det(this)
+
+  def T: MExp = transpose(this)
 }
 
 // Set of all vector expression classes
@@ -29,15 +38,17 @@ case class CSMat(s: String) extends MExp with ConstantMatrix with SymmetricMatri
 case class CMat(s: String) extends MExp with ConstantMatrix
 case class SkewMat(s: String) extends MExp with SkewSymmetricMatrix
 
+
 // SO3
 case class SO3(s: String) extends MExp with SpecialEuclidean {
-  override def getEta: Vec = Vec("eta_{"+s+"}")
+  val etaStr: String = "eta_{" + s + "}"
+  val OmegaStr: String = "Omega_{" + s + "}"
 
   override def detm: Exp = Num(1.0) // determinant of SO3 is 1
 
-  def getDelta: MExp = MMul(SO3(s), SkewMat("eta_{"+s+"}"))
-
-  def getDiff: MExp = MMul(SO3(s), SkewMat("Omega_{"+s+"}"))
+  def getEta: Vec = Vec(this.etaStr)
+  def getDelta: MExp = MMul(SO3(s), SkewMat(this.etaStr))
+  def getDiff: MExp = MMul(SO3(s), SkewMat(this.OmegaStr))
 }
 
 //case class deltaM(m: SO3) extends MExp  {

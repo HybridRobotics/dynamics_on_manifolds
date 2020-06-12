@@ -5,6 +5,7 @@ import java.io.{File, PrintWriter}
 import hybridrobotics.dynamics.operations.Differentiation.diffV
 import hybridrobotics.dynamics.operations.DynamicalModelComputation.computeEquationsOfMotion
 import hybridrobotics.dynamics.operations._
+import hybridrobotics.dynamics.operations.PrintLine.print2LatexFile
 
 object SphericalPendulum {
 
@@ -17,9 +18,10 @@ object SphericalPendulum {
 
       // define vectors
       val e3  = CVec( "e3")  // orientation of gravity
+
       val  q  = UVec(  "q")  // point mass acts on S^2
       val xi  =  Vec( "xi")  // vector orthogonal to q and dq
-      val  u  =  Vec(  "u")  // virtual work done on system
+      val u  =  Vec(  "u")  // virtual work done on system
 
       // set configuration variables (scalars,vectors,matrices)
       val configVars = Tuple3(List(),List(q),List())
@@ -33,15 +35,6 @@ object SphericalPendulum {
       val infWork = Dot(deltaV(q),u)
 
       val eoms = computeEquationsOfMotion(L, infWork, configVars)
-      println(s"Done: $eoms")
-
-      // Generate txt file with latex equations
-      val eom_latex = eoms._1
-      val FILE_PATH = new java.io.File(".").getCanonicalPath
-      val writer = new PrintWriter(new File(FILE_PATH + """\output\SphericalPendulum.tex""" ))
-      for (str <- eom_latex) {
-          writer.write(str)
-      }
-      writer.close()
+      print2LatexFile(eoms._1, "SphericalPendulum")
     }
 }
