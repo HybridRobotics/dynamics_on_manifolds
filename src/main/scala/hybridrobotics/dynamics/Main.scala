@@ -7,7 +7,7 @@ import hybridrobotics.dynamics.mechanical_systems._
 
 object Main extends App {
 
-  QuadrotorWithLoad.main()
+  SphericalPendulum.main()
 
 }
 

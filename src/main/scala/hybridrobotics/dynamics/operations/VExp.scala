@@ -25,7 +25,7 @@ case class deltaV( u:VExp         ) extends VExp  // delta prefix
 case class Vec( s:String) extends VExp            // string wraped to VExp
 case class UVec(s:String) extends VExp with UnitVector     // string wraped to VExp
 case class CVec(s:String) extends VExp with ConstantVector // string wraped to VExp
-case class AVec(s:String,u:VExp) extends VExp // holds symbolic reference for large vector
+case class AVec(s:String, u:VExp) extends VExp // holds symbolic reference for large vector
 case class ZVec(s:String) extends VExp // zero vector
 
 

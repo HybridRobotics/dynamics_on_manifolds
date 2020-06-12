@@ -5,6 +5,7 @@ import java.io._
 import hybridrobotics.dynamics.operations.Differentiation.diffV
 import hybridrobotics.dynamics.operations.DynamicalModelComputation.computeEquationsOfMotion
 import hybridrobotics.dynamics.operations._
+import hybridrobotics.dynamics.operations.PrintLine.print2LatexFile
 
 object RigidBody {
 
@@ -47,18 +48,9 @@ object RigidBody {
 
     // solve for equations of motion
     val eoms = computeEquationsOfMotion(L, infWork, configVars)
-    println(s"Done: $eoms")
+    print2LatexFile(eoms._1, "RigidBody")
 
-    // Generate txt file with latex equations
-    val eom_latex = eoms._1
-    val FILE_PATH = new java.io.File(".").getCanonicalPath
-    val writer = new PrintWriter(new File(FILE_PATH + """\output\RigidBody.tex""" ))
-    for (str <- eom_latex) {
-      writer.write(str)
-    }
-    writer.close()
-
-    // functionality to generate Matlab function
+    // TODO functionality to generate Matlab function
 
 
   }

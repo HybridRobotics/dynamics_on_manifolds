@@ -8,3 +8,7 @@ trait ConstantMatrix {}
 trait SkewSymmetricMatrix {}
 
 trait Unimodular {}
+
+trait SpecialEuclidean {
+  def getEta: Vec
+}

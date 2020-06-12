@@ -6,6 +6,8 @@ import hybridrobotics.dynamics.operations.Differentiation.diffV
 import hybridrobotics.dynamics.operations.DynamicalModelComputation.computeEquationsOfMotion
 import hybridrobotics.dynamics.operations._
 import hybridrobotics.dynamics.operations.Simplification._
+import hybridrobotics.dynamics.operations.PrintLine.print2LatexFile
+
 
 object QuadrotorWithLoad {
 
@@ -53,20 +55,13 @@ object QuadrotorWithLoad {
     // define infinitesimal work
     val f = Var("f")
     val M = Vec("M")
-    val infWork = (M dot eta) + (deltaV(xQ) dot (R**e3*f))
+    val infWork = (M dot eta) + ((deltaV(xL) - (deltaV(q) * l)) dot (R**e3*f)) // TODO fix the issue with deltaV(xQ)
 
     val eoms = computeEquationsOfMotion(L, infWork, configVars)
     println(s"Done: $eoms")
 
     // Generate txt file with latex equations
-    val eom_latex = eoms._1
-    val FILE_PATH = new java.io.File(".").getCanonicalPath
-    val writer = new PrintWriter(new File(FILE_PATH + """\output\QuadrotorWithLoad.tex""" ))
-    writer.write("Quadrotor with load: Equations of Motion\n\\begin{itemize}\n")
-    for (str <- eom_latex) {
-      writer.write("""\item """+str+"\n")
-    }
-    writer.write("""\end{itemize}""")
-    writer.close()
+    print2LatexFile(eoms._1, "QuadrotorWithLoad")
+
   }
 }

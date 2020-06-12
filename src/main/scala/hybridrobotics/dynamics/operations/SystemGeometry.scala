@@ -7,6 +7,16 @@ import Variation._
 
 object SystemGeometry {
 
+//  def HatMap(v: VExp): Unit = {
+//    e: match = e {}
+////    println(s""+v.s+"")
+//    println("Debug")
+//  }
+
+  def VeeMap(m: MExp): Unit = {
+
+  }
+
   def getXi(v: VExp): VExp = v match {
     case UVec(s) => Vec(s.replace("q", "xi"))
     case u: VExp => deltaV(u)
