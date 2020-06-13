@@ -1,16 +1,12 @@
 package hybridrobotics.dynamics.data_types
 
 // Matrix Expression
-trait MatrixExpr extends Variable with TimeVarying {
+trait MatrixExpr extends Expr with TimeVarying {
   //Wrap s:String to MatrixExp
 
   import language.implicitConversions
 
   implicit def str2MatrixExpr(s: String, t: String): MatrixExpr = Matrix(s)
-
-  override val name: String = ""
-
-  override val size = List(3, 3)
 
   override def diff(): MatrixExpr = {
     this match {
@@ -90,8 +86,9 @@ trait MatrixExpr extends Variable with TimeVarying {
 
 }
 
-
+//
 // Matrix Algebra classes
+//
 case class SMMul(u: MatrixExpr, v: ScalarExpr) extends MatrixExpr // u *   v infix
 
 case class MVMul(u: MatrixExpr, v: VectorExpr) extends VectorExpr // u **  v infix
@@ -112,9 +109,12 @@ case class TransposeMatrix(m: MatrixExpr) extends MatrixExpr {
 
 case class CrossMap(v: VectorExpr) extends MatrixExpr with SkewSymmetricMatrix
 
-
+//
 // Matrix Types
-case class Matrix(override val name: String) extends MatrixExpr {
+//
+trait BaseMatrixVariable extends MatrixExpr with Variable {
+
+  override val size = List(3, 3)
 
   override def diff(): MatrixExpr = Matrix("dot" + this.name)
 
@@ -122,48 +122,43 @@ case class Matrix(override val name: String) extends MatrixExpr {
 
   override def d: MatrixExpr = Matrix(this.name+"_d")
 
+  override def getVariation(): Any = this.delta()
 }
 
-case class SymMatrix(override val name: String) extends MatrixExpr with SymmetricMatrix {
+case class Matrix(override val name: String) extends BaseMatrixVariable
 
-  override def diff(): MatrixExpr = Matrix("dot" + this.name)
-
-  override def delta(): MatrixExpr = DeltaM(this)
+case class SymMatrix(override val name: String) extends BaseMatrixVariable with SymmetricMatrix {
 
   override def d: MatrixExpr = SymMatrix(this.name+"_d")
 
 }
 
-case class ConstSymMatrix(override val name: String) extends MatrixExpr with ConstantMatrix with SymmetricMatrix {
+case class ConstSymMatrix(override val name: String) extends BaseMatrixVariable with ConstantMatrix with SymmetricMatrix {
 
-  override def diff(): MatrixExpr = SMMul(Matrix("dot" + this.name), NumScalar(0.0))
-
-  override def delta(): MatrixExpr = SMMul(this, NumScalar(0.0))
-
-  override def d: MatrixExpr = ConstSymMatrix(this.name+"_d")
-}
-
-case class ConstMatrix(override val name: String) extends MatrixExpr with ConstantMatrix {
-
-  override def diff(): MatrixExpr = SMMul(Matrix("dot" + this.name), NumScalar(0.0))
+  override def diff(): MatrixExpr = SMMul(this, NumScalar(0.0))
 
   override def delta(): MatrixExpr = SMMul(this, NumScalar(0.0))
 
-  override def d: MatrixExpr = ConstMatrix(this.name+"_d")
+  override def d: MatrixExpr = this
+}
+
+case class ConstMatrix(override val name: String) extends BaseMatrixVariable with ConstantMatrix {
+
+  override def diff(): MatrixExpr = SMMul(this, NumScalar(0.0))
+
+  override def delta(): MatrixExpr = SMMul(this, NumScalar(0.0))
+
+  override def d: MatrixExpr = this
 
 }
 
-case class SkewSymMatrix(override val name: String) extends MatrixExpr with SkewSymmetricMatrix {
-
-  override def diff(): MatrixExpr = Matrix("dot" + this.name)
-
-  override def delta(): MatrixExpr = DeltaM(this)
+case class SkewSymMatrix(override val name: String) extends BaseMatrixVariable with SkewSymmetricMatrix {
 
   override def d: MatrixExpr = SkewSymMatrix(this.name+"_d")
 
 }
 
-case class SO3(override val name: String) extends MatrixExpr with SpecialEuclidean with SmoothManifold {
+case class SO3(override val name: String) extends BaseMatrixVariable with SpecialEuclidean with SmoothManifold {
 
   val variationStr: String = "eta_{" + name + "}"
   val tangentStr: String = "Omega_{" + name + "}"
@@ -179,5 +174,7 @@ case class SO3(override val name: String) extends MatrixExpr with SpecialEuclide
   override def diff(): MatrixExpr = MMul(this, CrossMap(this.getTangentVector))
 
   override def d: MatrixExpr = SO3(this.name+"_d")
+
+  override def getVariation(): VectorExpr = this.getTangentVector
 
 }

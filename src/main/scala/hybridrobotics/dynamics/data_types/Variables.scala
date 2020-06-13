@@ -11,6 +11,12 @@ trait Variable {
 
   val size: List[Int]
 
+  def d: Any // Desired Variable
+
+  def getVariation(): Any
+}
+
+trait Expr {
   def basicSimplify(): Any
 }
 

@@ -1,16 +1,12 @@
 package hybridrobotics.dynamics.data_types
 
 // Vector Expression
-trait VectorExpr extends Variable with TimeVarying {
+trait VectorExpr extends Expr with TimeVarying {
   //Wrap s:String to MatrixExp
 
   import language.implicitConversions
 
   implicit def str2VectorExpr(s: String, t: String): VectorExpr = Vector(s)
-
-  override val name: String = ""
-
-  override val size = List(3, 1)
 
   override def diff(): VectorExpr = {
     this match {
@@ -89,8 +85,6 @@ trait VectorExpr extends Variable with TimeVarying {
 
   def T: VectorExpr = TransposeVector(this)
 
-  def d: VectorExpr = this
-
   // other functions
   override def basicSimplify(): VectorExpr = {
     this match {
@@ -117,8 +111,6 @@ case class TransposeVector(v: VectorExpr) extends VectorExpr {
 
   override def T: VectorExpr = this.v
 
-  override val size: List[Int] = List(this.v.size(1), this.v.size(0))
-
 }
 
 case class VVMul(u: VectorExpr, v: TransposeVector) extends MatrixExpr
@@ -128,57 +120,58 @@ case class VeeMap(m: MatrixExpr) extends VectorExpr // TODO update input to Skew
 //
 // Vector Types
 //
-case class Vector(override val name: String) extends VectorExpr {
-  // Normal Vector
+trait BaseVectorVariable extends VectorExpr with Variable {
+
+  override val size = List(3, 1)
+
   override def diff(): VectorExpr = Vector("dot" + this.name)
 
   override def delta(): VectorExpr = DeltaV(this)
 
-  override def d: VectorExpr = Vector(this.name+"_d")
+  override def getVariation(): VectorExpr = this.delta()
 
+  override def d: VectorExpr = Vector(this.name + "_d")
 }
 
-case class UnitVector(override val name: String) extends VectorExpr with UnitNorm {
+case class Vector(override val name: String) extends BaseVectorVariable
+
+case class UnitVector(override val name: String) extends BaseVectorVariable with UnitNorm {
   // UnitVector
-  override def diff(): VectorExpr = Vector("dot" + this.name)
-
-  override def delta(): VectorExpr = DeltaV(this)
-
-  override def d: VectorExpr = UnitVector(this.name+"_d")
+  override def d: VectorExpr = UnitVector(this.name + "_d")
 }
 
-case class ConstVector(override val name: String) extends VectorExpr with ConstantVector {
+case class ConstVector(override val name: String) extends BaseVectorVariable with ConstantVector {
   // Constant Vector
-  override def diff(): VectorExpr = SMul(ZeroVector("dot" + this.name), NumScalar(0))
+  override def diff(): VectorExpr = SMul(this, NumScalar(0))
 
   override def delta(): VectorExpr = SMul(this, NumScalar(0.0))
 
-  override def d: VectorExpr = ConstVector(this.name+"_d")
+  override def d: VectorExpr = ConstVector(this.name + "_d")
 
 }
 
 //case class AVec(s: String, u: VectorExpr) extends VectorExpr // holds symbolic reference for large vector
 
-case class ZeroVector(override val name: String) extends VectorExpr {
+case class ZeroVector(override val name: String) extends BaseVectorVariable {
   // ZeroVector Vector
-  override def diff(): VectorExpr = SMul(ZeroVector("dot" + this.name), NumScalar(0))
+  override def diff(): VectorExpr = SMul(this, NumScalar(0))
 
   override def delta(): VectorExpr = SMul(this, NumScalar(0.0))
 
-  override def d: VectorExpr = ZeroVector(this.name+"_d")
+  override def d: VectorExpr = ZeroVector(this.name + "_d")
 }
 
-case class SkewMatVector(override val name: String) extends VectorExpr {
+case class SkewMatVector(override val name: String) extends BaseVectorVariable {
   // TODO update this vector  (or make it obsolete)
   override def diff(): VectorExpr = Vector(this.name + "dot")
 
   override def delta(): VectorExpr = DeltaV(this)
 
-  override def d: VectorExpr = SkewMatVector(this.name+"_d")
+  override def d: VectorExpr = SkewMatVector(this.name + "_d")
 
 }
 
-case class S2(override val name: String) extends VectorExpr with UnitNorm with SmoothManifold {
+case class S2(override val name: String) extends BaseVectorVariable with UnitNorm with SmoothManifold {
 
   val variationStr: String = "xi_{" + name + "}"
   val tangentStr: String = "omega_{" + name + "}"
@@ -193,6 +186,8 @@ case class S2(override val name: String) extends VectorExpr with UnitNorm with S
 
   override def diff(): VectorExpr = Cross(this.getTangentVector, this)
 
-  override def d: VectorExpr = S2(this.name+"_d")
+  override def getVariation(): VectorExpr = this.getVariationVector
+
+  override def d: VectorExpr = S2(this.name + "_d")
 
 }

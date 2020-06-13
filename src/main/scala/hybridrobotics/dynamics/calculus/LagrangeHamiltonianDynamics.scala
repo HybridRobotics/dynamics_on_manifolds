@@ -18,7 +18,7 @@ object LagrangeHamiltonianDynamics {
     // Convert Input Tree to Desired Format (terms expanded and combined numeric constants)
     var L = Lagrangian.basicSimplify()
     L = expansion(L)
-//    L = simplify(L)
+    L = simplifyScalarExpr(L)
 
     println("Testing Done!")
   }

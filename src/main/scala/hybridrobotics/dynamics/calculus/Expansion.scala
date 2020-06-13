@@ -5,6 +5,13 @@ import hybridrobotics.dynamics.data_types._
 
 object Expansion {
 
+  // expands complete abstract syntax tree
+  // expands complete abstract syntax tree
+  def expansion(e: ScalarExpr): ScalarExpr = {
+    var A = expand(e)
+    return A
+  }
+
   // expand expression
   def expandM(m: MatrixExpr): MatrixExpr = m match {
     case MAdd(u, v) => MAdd(expandM(u), expandM(v))
@@ -87,9 +94,4 @@ object Expansion {
     case u: ScalarExpr => u
   }
 
-  // expands complete abstract syntax tree
-  def expansion(e: ScalarExpr): ScalarExpr = {
-    var A = expand(e)
-    return A
-  }
 }

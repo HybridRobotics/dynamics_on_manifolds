@@ -2,7 +2,7 @@ package hybridrobotics.dynamics.data_types
 
 
 // Scalar Expression
-trait ScalarExpr extends Variable with TimeVarying {
+trait ScalarExpr extends Expr with TimeVarying {
   //Wrap s:String to ScalarExpr
 
   import language.implicitConversions
@@ -12,10 +12,6 @@ trait ScalarExpr extends Variable with TimeVarying {
   implicit def double2ScalarExpr(d: Double): ScalarExpr = NumScalar(d)
 
   implicit def str2ScalarExpr(name: String): ScalarExpr = VarScalar(name)
-
-  override val name: String = ""
-
-  override val size = List(1, 1)
 
   override def diff(): ScalarExpr = {
     this match {
@@ -131,33 +127,46 @@ trait ScalarExpr extends Variable with TimeVarying {
 
 }
 
+//
 // Scalar Types
-case class NumScalar(value: Double) extends ScalarExpr {
+//
+trait BaseScalarVariable extends ScalarExpr with Variable {
+  override val size = List(1, 1)
 
+  override def diff(): ScalarExpr = VarScalar("dot" + this.name)
+
+  override def delta(): ScalarExpr = DeltaS(this)
+
+  override def getVariation(): ScalarExpr = this.delta()
+
+  override def d: ScalarExpr = VarScalar(this.name+"_d")
+}
+
+case class NumScalar(value: Double) extends BaseScalarVariable {
+  // Numeric
   override val name: String = String.valueOf(value)
 
-  // Numeric
   override def diff(): ScalarExpr = NumScalar(0.0)
 
   override def delta(): ScalarExpr = NumScalar(0.0)
 
+  override def d: ScalarExpr = this
 }
 
-case class VarScalar(override val name: String) extends ScalarExpr {
-  // Variable string
-  override def diff(): ScalarExpr = VarScalar("dot" + this.name)
+case class VarScalar(override val name: String) extends BaseScalarVariable
 
-  override def delta(): ScalarExpr = DeltaS(this)
-}
-
-case class ConstScalar(override val name: String) extends ScalarExpr {
+case class ConstScalar(override val name: String) extends BaseScalarVariable {
   // Constant scalar
   override def diff(): ScalarExpr = NumScalar(0.0)
 
   override def delta(): ScalarExpr = NumScalar(0.0)
+
+  override def d: ScalarExpr = this
 }
 
+//
 // Scalar Operation classes
+//
 case class DeltaS(u: ScalarExpr) extends ScalarExpr // delta prefix
 
 case class Par(u: ScalarExpr) extends ScalarExpr // parentheses
