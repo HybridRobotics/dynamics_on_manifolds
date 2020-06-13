@@ -8,6 +8,9 @@ trait TimeVarying {
 
 trait Variable {
   val name: String
+
   val size: List[Int]
+
+  def basicSimplify(): Any
 }
 

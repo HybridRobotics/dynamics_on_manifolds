@@ -14,17 +14,55 @@ trait MatrixExpr extends Variable with TimeVarying {
 
   override def diff(): MatrixExpr = {
     this match {
-      case SMMul(u: MatrixExpr, v: ScalarExpr) => MAdd(SMMul(u.diff(), v), SMMul(u, v.diff()))
-      case MMul(u: MatrixExpr, v: MatrixExpr) => MAdd(MMul(u.diff(), v), MMul(u, v.diff()))
-      case MAdd(u: MatrixExpr, v: MatrixExpr) => MAdd(u.diff(), v.diff())
+      case SMMul(m: MatrixExpr, s: ScalarExpr) =>
+        if (s.isInstanceOf[NumScalar] || s.isInstanceOf[ConstScalar]) SMMul(m.diff(), s)
+        else if (m.isInstanceOf[ConstantMatrix]) SMMul(m, s.diff())
+        else MAdd(SMMul(m.diff(), s), SMMul(m, s.diff()))
+
+      case MMul(a: MatrixExpr, b: MatrixExpr) =>
+        if (a.isInstanceOf[ConstantMatrix]) MMul(a, b.diff())
+        else if (b.isInstanceOf[ConstantMatrix]) MMul(a.diff(), b)
+        else MAdd(MMul(a.diff(), b), MMul(a, b.diff()))
+
+      case MAdd(a: MatrixExpr, b: MatrixExpr) =>
+        if (a.isInstanceOf[ConstantMatrix]) b.diff()
+        else if (b.isInstanceOf[ConstantMatrix]) a.diff()
+        else MAdd(a.diff(), b.diff())
+
       case DeltaM(m: MatrixExpr) => DeltaM(m.diff())
+
       case TransposeMatrix(m: MatrixExpr) => TransposeMatrix(m.diff())
+
       case CrossMap(v: VectorExpr) => CrossMap(v.diff())
+
       case _ => this.diff()
     }
   }
 
-  override def delta(): MatrixExpr = DeltaM(this)
+  override def delta(): MatrixExpr = {
+    this match {
+      case SMMul(m: MatrixExpr, s: ScalarExpr) =>
+        if (s.isInstanceOf[NumScalar] || s.isInstanceOf[ConstScalar]) SMMul(m.delta(), s)
+        else if (m.isInstanceOf[ConstantMatrix]) SMMul(m, s.delta())
+        else MAdd(SMMul(m.delta(), s), SMMul(m, s.delta()))
+
+      case MMul(a: MatrixExpr, b: MatrixExpr) =>
+        if (a.isInstanceOf[ConstantMatrix]) MMul(a, b.delta())
+        else if (b.isInstanceOf[ConstantMatrix]) MMul(a.delta(), b)
+        else MAdd(MMul(a.delta(), b), MMul(a, b.delta()))
+
+      case MAdd(a: MatrixExpr, b: MatrixExpr) =>
+        if (a.isInstanceOf[ConstantMatrix]) b.delta()
+        else if (b.isInstanceOf[ConstantMatrix]) a.delta()
+        else MAdd(a.delta(), b.delta())
+
+      case TransposeMatrix(m: MatrixExpr) => TransposeMatrix(m.delta())
+
+      case CrossMap(v: VectorExpr) => CrossMap(v.delta())
+
+      case _ => this.delta()
+    }
+  }
 
   // Algebra (Infix) operators
   def *(u: ScalarExpr): MatrixExpr = SMMul(this, u)
@@ -35,11 +73,20 @@ trait MatrixExpr extends Variable with TimeVarying {
 
   def +(m: MatrixExpr): MatrixExpr = MAdd(this, m)
 
-  def -(m: MatrixExpr): MatrixExpr = MAdd(this, SMMul(m, Num(-1)))
+  def -(m: MatrixExpr): MatrixExpr = MAdd(this, SMMul(m, NumScalar(-1)))
 
   def T: MatrixExpr = TransposeMatrix(this)
 
   def det(): ScalarExpr = Det(this)
+
+  def d: MatrixExpr = this
+
+  // other functions
+  override def basicSimplify(): MatrixExpr = {
+    this match {
+      case _ => this
+    }
+  }
 
 }
 
@@ -71,29 +118,48 @@ case class Matrix(override val name: String) extends MatrixExpr {
 
   override def diff(): MatrixExpr = Matrix("dot" + this.name)
 
+  override def delta(): MatrixExpr = DeltaM(this)
+
+  override def d: MatrixExpr = Matrix(this.name+"_d")
+
 }
 
 case class SymMatrix(override val name: String) extends MatrixExpr with SymmetricMatrix {
 
   override def diff(): MatrixExpr = Matrix("dot" + this.name)
 
+  override def delta(): MatrixExpr = DeltaM(this)
+
+  override def d: MatrixExpr = SymMatrix(this.name+"_d")
+
 }
 
 case class ConstSymMatrix(override val name: String) extends MatrixExpr with ConstantMatrix with SymmetricMatrix {
 
-  override def diff(): MatrixExpr = SMMul(Matrix("dot" + this.name), Num(0.0))
+  override def diff(): MatrixExpr = SMMul(Matrix("dot" + this.name), NumScalar(0.0))
 
+  override def delta(): MatrixExpr = SMMul(this, NumScalar(0.0))
+
+  override def d: MatrixExpr = ConstSymMatrix(this.name+"_d")
 }
 
 case class ConstMatrix(override val name: String) extends MatrixExpr with ConstantMatrix {
 
-  override def diff(): MatrixExpr = SMMul(Matrix("dot" + this.name), Num(0.0))
+  override def diff(): MatrixExpr = SMMul(Matrix("dot" + this.name), NumScalar(0.0))
+
+  override def delta(): MatrixExpr = SMMul(this, NumScalar(0.0))
+
+  override def d: MatrixExpr = ConstMatrix(this.name+"_d")
 
 }
 
 case class SkewSymMatrix(override val name: String) extends MatrixExpr with SkewSymmetricMatrix {
 
   override def diff(): MatrixExpr = Matrix("dot" + this.name)
+
+  override def delta(): MatrixExpr = DeltaM(this)
+
+  override def d: MatrixExpr = SkewSymMatrix(this.name+"_d")
 
 }
 
@@ -102,7 +168,7 @@ case class SO3(override val name: String) extends MatrixExpr with SpecialEuclide
   val variationStr: String = "eta_{" + name + "}"
   val tangentStr: String = "Omega_{" + name + "}"
 
-  override def det(): ScalarExpr = Num(1.0)
+  override def det(): ScalarExpr = NumScalar(1.0)
 
   override def getTangentVector: VectorExpr = Vector(this.tangentStr)
 
@@ -111,5 +177,7 @@ case class SO3(override val name: String) extends MatrixExpr with SpecialEuclide
   override def delta(): MatrixExpr = MMul(this, CrossMap(this.getVariationVector))
 
   override def diff(): MatrixExpr = MMul(this, CrossMap(this.getTangentVector))
+
+  override def d: MatrixExpr = SO3(this.name+"_d")
 
 }
