@@ -8,7 +8,21 @@ import hybridrobotics.dynamics.calculus.Simplification._
 
 object ExampleSystem {
 
-  def main(): Unit = {
+  def main() : Unit = {
+
+    val x = Vector("x")
+    val R = SO3("R")
+    val variables = List(x.getVariation, R.getVariation )
+
+    var rot_eqn = R.diff().delta() - R.delta().diff()
+    rot_eqn.basicSimplify()
+//    simplifyScalarExpr()
+
+    println("Testing Done!")
+
+  }
+
+  def derive_eom_example(): Unit = {
 
     // define constant scalars
     val g = ConstScalar("g") // gravitational constant

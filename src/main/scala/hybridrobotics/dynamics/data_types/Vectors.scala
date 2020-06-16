@@ -1,7 +1,7 @@
 package hybridrobotics.dynamics.data_types
 
 // Vector Expression
-trait VectorExpr extends Expr with TimeVarying {
+trait VectorExpr extends Expression with TimeVarying {
   //Wrap s:String to MatrixExp
 
   import language.implicitConversions
@@ -70,6 +70,8 @@ trait VectorExpr extends Expr with TimeVarying {
     }
   }
 
+  override def getVariation: VectorExpr = this.delta()
+
   //Infix operators
   def x(v: VectorExpr): VectorExpr = Cross(this, v)
 
@@ -128,8 +130,6 @@ trait BaseVectorVariable extends VectorExpr with Variable {
 
   override def delta(): VectorExpr = DeltaV(this)
 
-  override def getVariation(): VectorExpr = this.delta()
-
   override def d: VectorExpr = Vector(this.name + "_d")
 }
 
@@ -173,8 +173,8 @@ case class SkewMatVector(override val name: String) extends BaseVectorVariable {
 
 case class S2(override val name: String) extends BaseVectorVariable with UnitNorm with SmoothManifold {
 
-  val variationStr: String = "xi_{" + name + "}"
-  val tangentStr: String = "omega_{" + name + "}"
+  val variationStr: String = "xi_{" + this.name + "}"
+  val tangentStr: String = "omega_{" + this.name + "}" // TODO find a better way to represent the variable
 
   def norm: ScalarExpr = NumScalar(1.0)
 
@@ -186,7 +186,7 @@ case class S2(override val name: String) extends BaseVectorVariable with UnitNor
 
   override def diff(): VectorExpr = Cross(this.getTangentVector, this)
 
-  override def getVariation(): VectorExpr = this.getVariationVector
+  override def getVariation: VectorExpr = this.getVariationVector
 
   override def d: VectorExpr = S2(this.name + "_d")
 

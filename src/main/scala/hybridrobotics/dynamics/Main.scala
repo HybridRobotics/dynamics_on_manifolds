@@ -8,6 +8,7 @@ import hybridrobotics.dynamics.mechanical_systems._
 object Main extends App {
 
   ExampleSystem.main()
+//  QuadrotorWithLoad.main()
 
 
 }

@@ -4,6 +4,8 @@ trait TimeVarying {
   def diff(): Any
 
   def delta(): Any
+
+  def getVariation: Any
 }
 
 trait Variable {
@@ -12,11 +14,9 @@ trait Variable {
   val size: List[Int]
 
   def d: Any // Desired Variable
-
-  def getVariation(): Any
 }
 
-trait Expr {
+trait Expression {
   def basicSimplify(): Any
 }
 

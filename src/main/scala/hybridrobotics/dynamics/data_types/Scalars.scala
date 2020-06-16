@@ -2,7 +2,7 @@ package hybridrobotics.dynamics.data_types
 
 
 // Scalar Expression
-trait ScalarExpr extends Expr with TimeVarying {
+trait ScalarExpr extends Expression with TimeVarying {
   //Wrap s:String to ScalarExpr
 
   import language.implicitConversions
@@ -62,6 +62,8 @@ trait ScalarExpr extends Expr with TimeVarying {
       case _ => this.diff()
     }
   }
+
+  override def getVariation: ScalarExpr = this.delta()
 
   // (Algebra) Infix operators from high to low using Scala precedence
   def *(v: ScalarExpr): ScalarExpr = Mul(this, v)
@@ -137,7 +139,7 @@ trait BaseScalarVariable extends ScalarExpr with Variable {
 
   override def delta(): ScalarExpr = DeltaS(this)
 
-  override def getVariation(): ScalarExpr = this.delta()
+  override def getVariation: ScalarExpr = this.delta()
 
   override def d: ScalarExpr = VarScalar(this.name+"_d")
 }

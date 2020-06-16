@@ -25,8 +25,16 @@ object DynamicalModelComputation {
 
     // Step 0: Generate Collection Terms and Constraints of the Configuration Manifold
     // Check for Geometry Dependent Equations of Motion
+
+    // collects the variations
+    // List(scalar variations, vector variations, matrix variations)
     var colTerms = generateCollectionTerms(configVars)
+
+    // collect various variation and manifold kinematic rules
+    // conditions on q and R
     var Rules = generateRules(configVars, colTerms)
+
+    // generating kinematic equations for S2 and SO3 // TODO much of this can be avoided
     var geometric_eom = checkGeometry(configVars, Rules)
     var rules2 = Rules._2
     // for (keyVal <- geometric_eom._2) {rules2 += keyVal}

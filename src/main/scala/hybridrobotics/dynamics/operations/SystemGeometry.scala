@@ -84,7 +84,7 @@ object SystemGeometry {
         */
         rules1 += (Dot(v, deltaV(v)) -> Num(0), Dot(v, diffV(v)) -> Num(0), Dot(getXi(v), v) -> Num(0))
 
-        /* Adding unit vector relation to its varation
+        /* Adding unit vector relation to its variation
             \delta q = cross(xi, q)
             \delta\dot q = cross(\dot \xi,q)+cross(xi, \dot q)
          */
@@ -92,7 +92,17 @@ object SystemGeometry {
       }
     }
     for (r <- matrices) {
+
+      /*
+      Adding angular velocity variation
+      \delta {\Omega} = \Omega\times \eta + \eta\dot
+       */
       rules2 += deltaV(getOmega(r)) -> VAdd(Cross(getOmega(r), getEta(r)), diffV(getEta(r)))
+
+      /*
+      Adding rotation matrix variation
+      \delta R = R\hatmap{\eta}//
+       */
       rules3 += deltaM(r) -> MMul(r, getSkewEta(r))
     }
     return Tuple3(rules1, rules2, rules3)

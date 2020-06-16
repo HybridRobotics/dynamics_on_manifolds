@@ -1,7 +1,7 @@
 package hybridrobotics.dynamics.data_types
 
 // Matrix Expression
-trait MatrixExpr extends Expr with TimeVarying {
+trait MatrixExpr extends Expression with TimeVarying {
   //Wrap s:String to MatrixExp
 
   import language.implicitConversions
@@ -59,6 +59,8 @@ trait MatrixExpr extends Expr with TimeVarying {
       case _ => this.delta()
     }
   }
+
+  override def getVariation: Any = this.delta() // TODO fix this datatype dependency issue
 
   // Algebra (Infix) operators
   def *(u: ScalarExpr): MatrixExpr = SMMul(this, u)
@@ -122,14 +124,18 @@ trait BaseMatrixVariable extends MatrixExpr with Variable {
 
   override def d: MatrixExpr = Matrix(this.name+"_d")
 
-  override def getVariation(): Any = this.delta()
+  override def getVariation: Any = this.delta()
 }
 
-case class Matrix(override val name: String) extends BaseMatrixVariable
+case class Matrix(override val name: String) extends BaseMatrixVariable {
+  override def getVariation: MatrixExpr = this.delta()
+}
 
 case class SymMatrix(override val name: String) extends BaseMatrixVariable with SymmetricMatrix {
 
   override def d: MatrixExpr = SymMatrix(this.name+"_d")
+
+  override def getVariation: MatrixExpr = this.delta()
 
 }
 
@@ -140,6 +146,9 @@ case class ConstSymMatrix(override val name: String) extends BaseMatrixVariable 
   override def delta(): MatrixExpr = SMMul(this, NumScalar(0.0))
 
   override def d: MatrixExpr = this
+
+  override def getVariation: MatrixExpr = this.delta()
+
 }
 
 case class ConstMatrix(override val name: String) extends BaseMatrixVariable with ConstantMatrix {
@@ -150,11 +159,15 @@ case class ConstMatrix(override val name: String) extends BaseMatrixVariable wit
 
   override def d: MatrixExpr = this
 
+  override def getVariation: MatrixExpr = this.delta()
+
 }
 
 case class SkewSymMatrix(override val name: String) extends BaseMatrixVariable with SkewSymmetricMatrix {
 
   override def d: MatrixExpr = SkewSymMatrix(this.name+"_d")
+
+  override def getVariation: MatrixExpr = this.delta()
 
 }
 
@@ -175,6 +188,6 @@ case class SO3(override val name: String) extends BaseMatrixVariable with Specia
 
   override def d: MatrixExpr = SO3(this.name+"_d")
 
-  override def getVariation(): VectorExpr = this.getTangentVector
+  override def getVariation: VectorExpr = this.getVariationVector
 
 }
