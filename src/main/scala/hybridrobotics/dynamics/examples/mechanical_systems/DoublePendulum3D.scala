@@ -1,4 +1,4 @@
-package hybridrobotics.dynamics.mechanical_systems
+package hybridrobotics.dynamics.examples.mechanical_systems
 
 import hybridrobotics.dynamics.operations.DynamicalModelComputation.computeEquationsOfMotion
 import hybridrobotics.dynamics.operations._

@@ -1,4 +1,4 @@
-package hybridrobotics.dynamics.mechanical_systems
+package hybridrobotics.dynamics.examples.mechanical_systems
 
 import hybridrobotics.dynamics.operations._
 import hybridrobotics.dynamics.operations.Variation.delta

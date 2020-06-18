@@ -1,13 +1,13 @@
-package hybridrobotics.dynamics.mechanical_systems
+package hybridrobotics.dynamics.examples.mechanical_systems
 
-import java.io.{File, PrintWriter}
+import java.io._
 
 import hybridrobotics.dynamics.operations.Differentiation.diffV
 import hybridrobotics.dynamics.operations.DynamicalModelComputation.computeEquationsOfMotion
 import hybridrobotics.dynamics.operations._
 import hybridrobotics.dynamics.operations.PrintLine.print2LatexFile
 
-object Quadrotor {
+object RigidBody {
 
   def main(): Unit = {
 
@@ -17,7 +17,7 @@ object Quadrotor {
     val J = CSMat("J")
 
     // define constant vectors
-    val e3     = CVec("e_3")
+    val e3     = CVec("e3")
 
     // defining states
     val x = Vec("x")
@@ -30,7 +30,7 @@ object Quadrotor {
     val eta_skew   = SkewMat("eta")
 
     // inputs
-    val f = Var("f")
+    val F = Vec("F")
     val M = Vec("M")
 
     // set configuration variables
@@ -41,16 +41,17 @@ object Quadrotor {
     val PE = m*g*Dot(x, e3)
 
     // Lagrangian
-    var L = KE - PE
+    val L = KE - PE
 
     // define infinitesimal work)
-    val infWork = (M dot eta) + (deltaV(x) dot (R**e3*f))
+    val infWork = (M dot eta) + (deltaV(x) dot F)
 
+    // solve for equations of motion
     val eoms = computeEquationsOfMotion(L, infWork, configVars)
-    println(s"Done: $eoms")
+    print2LatexFile(eoms._1, "RigidBody")
 
-    // Generate txt file with latex equations
-    print2LatexFile(eoms._1, "Quadrotor")
+    // TODO functionality to generate Matlab function
+
 
   }
 

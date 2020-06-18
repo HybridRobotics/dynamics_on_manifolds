@@ -1,4 +1,4 @@
-package hybridrobotics.dynamics.mechanical_systems
+package hybridrobotics.dynamics.examples.mechanical_systems
 
 import hybridrobotics.dynamics.calculus.LagrangeHamiltonianDynamics._
 import hybridrobotics.dynamics.data_types._

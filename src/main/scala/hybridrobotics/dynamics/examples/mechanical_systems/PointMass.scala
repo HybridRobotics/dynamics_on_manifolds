@@ -1,4 +1,4 @@
-package hybridrobotics.dynamics.mechanical_systems
+package hybridrobotics.dynamics.examples.mechanical_systems
 
 import java.io.{File, PrintWriter}
 
@@ -34,7 +34,7 @@ object PointMass {
     val infWork = Dot(deltaV(x),u)
 
     val eoms = computeEquationsOfMotion(L, infWork, configVars)
-    print2LatexFile(eoms._1, "PointMass")
+    print2LatexFile(eoms._1, "PointMass2")
 
   }
 

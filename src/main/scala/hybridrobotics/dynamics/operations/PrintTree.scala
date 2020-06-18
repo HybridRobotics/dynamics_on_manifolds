@@ -163,7 +163,7 @@ object PrintLine {
 
   def print2LatexFile(equations: List[String], fileName: String): Unit = {
     val FILE_PATH = new java.io.File(".").getCanonicalPath
-    val writer = new PrintWriter(new File(FILE_PATH + "\\output\\" + fileName + ".tex"))
+    val writer = new PrintWriter(new File(FILE_PATH + File.separator+ "output"+File.separator + fileName + ".tex"))
     writer.write(fileName + ": Equations of Motion\n\\begin{itemize}\n")
     for (str <- equations) {
       writer.write("""\item """ + str + "\n")
