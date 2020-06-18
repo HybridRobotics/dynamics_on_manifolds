@@ -1,22 +1,68 @@
 package hybridrobotics.dynamics.mechanical_systems
 
-
 import hybridrobotics.dynamics.calculus.LagrangeHamiltonianDynamics._
 import hybridrobotics.dynamics.data_types._
 import hybridrobotics.dynamics.calculus.Simplification._
+import hybridrobotics.dynamics.calculus.MatrixManipulation._
+import hybridrobotics.dynamics.calculus.PrintLine._
 
 
 object ExampleSystem {
 
-  def main() : Unit = {
+  def main(): Unit = {
 
-    val x = Vector("x")
-    val R = SO3("R")
-    val variables = List(x.getVariation, R.getVariation )
+        //     Point-mass
+//        val x = Vector("x")
+//        val m = ConstScalar("m")
+//        val F = Vector("F")
+//        val acc = x.diff().diff()
+//        val equation = SMul(acc, m) - F
+//        val var_equation = equation.delta()
+//        val variables = List(acc.delta(), F.delta())
 
-    var rot_eqn = R.diff().delta() - R.delta().diff()
-    rot_eqn.basicSimplify()
-//    simplifyScalarExpr()
+    // Angular velocity SO3
+    //    val R = SO3("R")
+    //    val eta = R.getVariationVector
+    //    val Om = R.getTangentVector
+    //    val J = ConstMatrix("J")
+    //    val M = Vector("M")
+    //
+    //    val ang_acc_eqn = J**Om.diff() + Cross(Om, J**Om) - M
+    //    val var_ang_acc_eqn = ang_acc_eqn.delta()
+    //    val variables = List(eta, Om.diff().delta(), Om.delta(), DeltaV(M))
+
+
+    // Angular velocity S2
+    val filename = "VariationS2Pend"
+    val m = ConstScalar("m")
+    val l = ConstScalar("l")
+    val g = ConstScalar("g")
+    val e3 = ConstVector("e_3")
+    val q = S2("q")
+    val om = q.getTangentVector
+    val u = Vector("u")
+
+    val equation = om.diff() * m * l * l - Cross(q, e3) * m * g * l - u
+    val var_equation = equation.delta()
+    val variables = List(om.diff().delta(),  q.getVariationVector, om.delta(), u.delta())
+
+    val coefficients = extractVariationCoefficients(var_equation, variables)
+
+
+    // Output
+    var eqn_latex: String = "$"
+    for ((k, v) <- coefficients) {
+      val ks : String = printVLatex(k)
+      val vs : String = printMLatex(v)
+      eqn_latex = eqn_latex + "\\Big[" + vs + "\\Big]" + ks + "+"
+    }
+    eqn_latex = eqn_latex + "=0$"
+
+    print("%s\n", eqn_latex)
+    print2LatexFile(List("$"+printVLatex(equation)+"=0$",
+                          "$"+printVLatex(var_equation)+"=0$",
+                          eqn_latex),
+                    filename)
 
     println("Testing Done!")
 
@@ -37,10 +83,10 @@ object ExampleSystem {
     val u = Vector("u") // virtual work done on system
 
     // set configuration variables (scalars,vectors,matrices)
-    val configVars = Tuple3(List(),List(q),List())
+    val configVars = Tuple3(List(), List(q), List())
 
     // define lagrangian
-    val KE =  (q.diff() dot q.diff())* NumScalar(0.5) * m * l * l  // Kinetic Energy
+    val KE = (q.diff() dot q.diff()) * NumScalar(0.5) * m * l * l // Kinetic Energy
     val PE = m * g * l * (q dot e3) // Potential Energy
     val Lagrangian = KE - PE // Lagrangian
 
@@ -51,14 +97,18 @@ object ExampleSystem {
     val eoms = solveActionIntegral(Lagrangian, infWork, configVars)
 
 
-    /****************************************************/
-//    val a = NumScalar(10.0)
-//    val b = NumScalar(11.0)
-//    val c = VarScalar("xy")
-//    val value = a*b //Mul(b,c)
-//
-//    val v2 = value.basicSimplify()
-//    val v1  = basicSimplify(value)
+    /** **************************************************/
+    println("Testing Done!")
+  }
+
+  def test(): Unit = {
+    //    val a = NumScalar(10.0)
+    //    val b = NumScalar(11.0)
+    //    val c = VarScalar("xy")
+    //    val value = a*b //Mul(b,c)
+    //
+    //    val v2 = value.basicSimplify()
+    //    val v1  = basicSimplify(value)
 
 
     //    //    val m = Matrix("sample")
@@ -109,7 +159,6 @@ object ExampleSystem {
     //    val d2R = dR.diff()
     //    //    val deltaR = R.delta()
 
-    println("Testing Done!")
   }
 
 }

@@ -16,11 +16,36 @@ object TreeProperties {
   def isMember(e: ScalarExpr, z: ScalarExpr): Boolean = e match {
     case Add(u, v) => isMember(u, z) && isMember(v, z)
     case Mul(u, v) => isMember(u, z) && isMember(v, z)
-    case u: ScalarExpr => if (u == z) {
-      return true
-    } else {
-      return false
+    case u: ScalarExpr =>
+      if (u == z) return true
+      else return false
+  }
+
+  // is a vector element  in expression vectorExpr
+  def isVectorAMember(expr: Any, element: VectorExpr): Boolean = {
+    // this function verifies if a given vector is part of a expression
+    expr match {
+      case expr: ScalarExpr => expr match {
+        case Dot(a, b) => isVectorAMember(a, element) || isVectorAMember(b, element)
+      }
+      case expr: VectorExpr => expr match {
+        case VAdd(a, b) => isVectorAMember(a, element) || isVectorAMember(b, element)
+        case Cross(a, b) => isVectorAMember(a, element) || isVectorAMember(b, element)
+        case SMul(a, b) => isVectorAMember(a, element)
+        case TransposeVector(v) => isVectorAMember(v, element)
+        case MVMul(m, v) => isVectorAMember(v, element)
+        case expr: VectorExpr =>
+          if (expr == element)
+            return true
+          else
+            return false
+      }
+      case expr: MatrixExpr => expr match {
+        case VVMul(a, b) => isVectorAMember(a, element) || isVectorAMember(b, element)
+      }
+
     }
+
   }
 
   // find violations of the expanded structure
