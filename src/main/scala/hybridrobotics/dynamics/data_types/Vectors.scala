@@ -101,23 +101,73 @@ trait VectorExpr extends Expression with TimeVarying {
 //
 case class DeltaV(u: VectorExpr) extends VectorExpr // delta prefix
 
-case class Cross(u: VectorExpr, v: VectorExpr) extends VectorExpr // u x v infix
+case class Cross(u: VectorExpr, v: VectorExpr) extends VectorExpr {
+  // u x v infix
 
-case class SMul(u: VectorExpr, v: ScalarExpr) extends VectorExpr // u * v infix
+  override def basicSimplify(): VectorExpr = {
+    this match {
+      case _=> Cross(u.basicSimplify(), v.basicSimplify())
+    }
+  }
+}
 
-case class VAdd(u: VectorExpr, v: VectorExpr) extends VectorExpr // u + v infix
+case class SMul(u: VectorExpr, v: ScalarExpr) extends VectorExpr {
+  // u * v infix
+  override def basicSimplify(): VectorExpr = {
+    this match {
+      case  _ => SMul(u.basicSimplify(), v.basicSimplify())
+    }
+  }
+}
 
-case class Dot(u: VectorExpr, v: VectorExpr) extends ScalarExpr // u dot v infix
+case class VAdd(u: VectorExpr, v: VectorExpr) extends VectorExpr {
+  // u + v infix
+
+  override def basicSimplify(): VectorExpr = {
+    this match {
+      case VAdd(u, v) => VAdd(u.basicSimplify(), v.basicSimplify())
+      case _ => this
+    }
+  }
+}
+
+case class Dot(u: VectorExpr, v: VectorExpr) extends ScalarExpr {
+  // u dot v infix
+  override def basicSimplify(): ScalarExpr = {
+    this match {
+      case Dot(u, v) => Dot(u.basicSimplify(), v.basicSimplify())
+      case _ => this
+    }
+  }
+}
 
 case class TransposeVector(v: VectorExpr) extends VectorExpr {
 
   override def T: VectorExpr = this.v
 
+  override def basicSimplify(): VectorExpr = {
+    this match {
+      case _ => TransposeVector(this.v.basicSimplify())
+    }
+  }
+
 }
 
-case class VVMul(u: VectorExpr, v: TransposeVector) extends MatrixExpr
+case class VVMul(u: VectorExpr, v: TransposeVector) extends MatrixExpr {
+  override def basicSimplify(): MatrixExpr = {
+    this match {
+      case _ => VVMul(u.basicSimplify(), TransposeVector(v.v.basicSimplify()))
+    }
+  }
+}
 
-case class VeeMap(m: MatrixExpr) extends VectorExpr // TODO update input to SkewSymMatrix
+case class VeeMap(m: MatrixExpr) extends VectorExpr {
+  override def basicSimplify(): VectorExpr = {
+    this match {
+      case _ => VeeMap(m.basicSimplify())
+    }
+  }
+}
 
 //
 // Vector Types

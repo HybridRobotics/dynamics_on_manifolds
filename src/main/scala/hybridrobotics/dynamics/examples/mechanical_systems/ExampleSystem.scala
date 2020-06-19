@@ -11,14 +11,7 @@ object ExampleSystem {
 
   def main(): Unit = {
 
-        //     Point-mass
-//        val x = Vector("x")
-//        val m = ConstScalar("m")
-//        val F = Vector("F")
-//        val acc = x.diff().diff()
-//        val equation = SMul(acc, m) - F
-//        val var_equation = equation.delta()
-//        val variables = List(acc.delta(), F.delta())
+
 
     // Angular velocity SO3
     //    val R = SO3("R")

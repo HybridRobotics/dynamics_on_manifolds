@@ -4,20 +4,27 @@ import hybridrobotics.dynamics.calculus.MatrixManipulation.extractVariationCoeff
 import hybridrobotics.dynamics.calculus.PrintLine.{print2LatexFile, printMLatex, printVLatex}
 import hybridrobotics.dynamics.data_types._
 
-object PointMass {
+object RigidPendulum {
 
   def main(): Unit = {
 
     //     Point-mass
-    val filename:String = "VariationPointMass"
+    val filename: String = "VariationRigidPendulum"
 
-    val x = Vector("x")
+    // Angular velocity SO3
     val m = ConstScalar("m")
-    val F = Vector("F")
-    val acc = x.diff().diff()
-    val equation = SMul(acc, m) - F
+    val g = ConstScalar("g")
+    val e3 = ConstVector("e3")
+    val R = SO3("R")
+    val eta = R.getVariationVector
+    val Om = R.getTangentVector
+    val J = ConstMatrix("J")
+    val u = Vector("u")
+    val rho = ConstVector("\\rho")
+
+    val equation = J ** Om.diff() + Cross(Om, J ** Om) + Cross(rho, MVMul(R.T, e3))*m*g - u
     val var_equation = equation.delta()
-    val variables = List(acc.delta(), F.delta())
+    val variables = List(Om.diff().delta(), Om.delta(), eta, DeltaV(u))
 
     val startTime = System.nanoTime() // track computation time
     val coefficients = extractVariationCoefficients(var_equation, variables)
@@ -34,12 +41,13 @@ object PointMass {
     eqn_latex = eqn_latex + "=0$"
     print("%s\n", eqn_latex)
 
-    val list_of_eqns2print: List[String] = List("$" + printVLatex(equation) + "=0$",
+
+
+    var list_of_eqns: List[String] = List("$" + printVLatex(equation) + "=0$",
       "$" + printVLatex(var_equation) + "=0$",
       eqn_latex)
 
-    print2LatexFile(list_of_eqns2print, filename)
-
+    print2LatexFile(list_of_eqns, filename)
     println("Testing Done!")
   }
 

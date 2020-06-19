@@ -49,6 +49,7 @@ object PrintLine {
   def printMLatex(m: MatrixExpr): String = m match {
     case SMMul(a, b) => printLatex(b) + " " + printMLatex(a)
     case MAdd(a, b) => "(" + printMLatex(a) + "+" + printMLatex(b) + ")"
+    case SO3(s) => checkSymbols(s)
     case Matrix(s) => checkSymbols(s)
     case SymMatrix(s) => checkSymbols(s)
     case ConstSymMatrix(s) => checkSymbols(s)
@@ -58,7 +59,7 @@ object PrintLine {
     case SkewSymMatrix(s) => "\\hatmap{" + checkSymbols(s) + "}"
     case MMul(s, r) => printMLatex(s) + " " + printMLatex(r)
     case DeltaM(s) => "\\delta " + printMLatex(s)
-    case TransposeMatrix(s) => printMLatex(s) + "^{T}"
+    case TransposeMatrix(s) => "{("+printMLatex(s) + ")}^{T}"
     case CrossMap(v) => "{(" + printVLatex(v) + ")}^\\times"
   }
 

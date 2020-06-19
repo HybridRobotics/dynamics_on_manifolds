@@ -25,28 +25,70 @@ object TreeProperties {
   def isVectorAMember(expr: Any, element: VectorExpr): Boolean = {
     // this function verifies if a given vector is part of a expression
     expr match {
-      case expr: ScalarExpr => expr match {
-        case Dot(a, b) => isVectorAMember(a, element) || isVectorAMember(b, element)
-      }
-      case expr: VectorExpr => expr match {
-        case VAdd(a, b) => isVectorAMember(a, element) || isVectorAMember(b, element)
-        case Cross(a, b) => isVectorAMember(a, element) || isVectorAMember(b, element)
-        case SMul(a, b) => isVectorAMember(a, element)
-        case TransposeVector(v) => isVectorAMember(v, element)
-        case MVMul(m, v) => isVectorAMember(v, element)
-        case expr: VectorExpr =>
-          if (expr == element)
-            return true
-          else
-            return false
-      }
-      case expr: MatrixExpr => expr match {
-        case VVMul(a, b) => isVectorAMember(a, element) || isVectorAMember(b, element)
-      }
-
+        // Scalar Expr
+      case Dot(a, b) => isVectorAMember(a, element) || isVectorAMember(b, element)
+        // Vector Expr
+      case VAdd(a, b) => isVectorAMember(a, element) || isVectorAMember(b, element)
+      case Cross(a, b) => isVectorAMember(a, element) || isVectorAMember(b, element)
+      case SMul(a, b) => isVectorAMember(a, element)
+      case TransposeVector(v) => isVectorAMember(v, element)
+      case MVMul(m, v) => isVectorAMember(m, element) || isVectorAMember(v, element)
+        // Base case for vectors
+      case expr: VectorExpr =>
+        if (expr == element)
+          return true
+        else
+          return false
+        // Matrix Expr
+      case MAdd(a, b) => isVectorAMember(a, element) || isVectorAMember(b, element)
+      case MMul(u, v) => isVectorAMember(u, element) || isVectorAMember(v, element)
+      case SMMul(m, s) => isVectorAMember(m, element)
+      case VVMul(a, b) => isVectorAMember(a, element) || isVectorAMember(b, element)
+      case TransposeMatrix(m) => isVectorAMember(m, element)
+      case CrossMap(v) =>
+        if (v == element)
+          return true
+        else
+          return false
+      case _ => false
     }
-
   }
+
+  //
+  //  def isVectorAMember(expr: Any, element: VectorExpr): Boolean = {
+  //    // this function verifies if a given vector is part of a expression
+  //    expr match {
+  //      case expr: ScalarExpr => expr match {
+  //        case Dot(a, b) => isVectorAMember(a, element) || isVectorAMember(b, element)
+  //        case _ => false
+  //      }
+  //      case expr: VectorExpr => expr match {
+  //        case VAdd(a, b) => isVectorAMember(a, element) || isVectorAMember(b, element)
+  //        case Cross(a, b) => isVectorAMember(a, element) || isVectorAMember(b, element)
+  //        case SMul(a, b) => isVectorAMember(a, element)
+  //        case TransposeVector(v) => isVectorAMember(v, element)
+  //        case MVMul(m, v) => isVectorAMember(m, element) || isVectorAMember(v, element)
+  //        case expr: VectorExpr =>
+  //          if (expr == element)
+  //            return true
+  //          else
+  //            return false
+  //      }
+  //      case expr: MatrixExpr => expr match {
+  //        case VVMul(a, b) => isVectorAMember(a, element) || isVectorAMember(b, element)
+  //        case MMul(u, v) => isVectorAMember(u, element) || isVectorAMember(v, element)
+  //        case TransposeMatrix(m) => isVectorAMember(m, element)
+  //        case CrossMap(v) =>
+  //          if (v==element)
+  //            return true
+  //          else
+  //            return false
+  //        case _ => false
+  //      }
+  //
+  //    }
+  //
+  //  }
 
   // find violations of the expanded structure
   def nestedAdds(e: ScalarExpr): Boolean = e match {

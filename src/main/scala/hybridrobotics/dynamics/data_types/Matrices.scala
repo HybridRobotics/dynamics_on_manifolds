@@ -98,6 +98,11 @@ trait MatrixExpr extends Expression with TimeVarying {
 case class SMMul(u: MatrixExpr, v: ScalarExpr) extends MatrixExpr {
   // Matrix Scalar Multiplication
   // u *   v infix
+  override def basicSimplify(): MatrixExpr = {
+    this match {
+      case _ => SMMul(u.basicSimplify(), v.basicSimplify())
+    }
+  }
 
 }
 
@@ -155,9 +160,25 @@ case class TransposeMatrix(m: MatrixExpr) extends MatrixExpr {
 
   override def T: MatrixExpr = this.m
 
+  override def basicSimplify(): MatrixExpr = {
+    this match {
+      case TransposeMatrix(MAdd(u, v)) => MAdd(TransposeMatrix(u.basicSimplify()).basicSimplify(), TransposeMatrix(v.basicSimplify()).basicSimplify())
+      case TransposeMatrix(MMul(u, v)) => MMul(TransposeMatrix(v.basicSimplify()).basicSimplify(), TransposeMatrix(u.basicSimplify()).basicSimplify())
+      case TransposeMatrix(CrossMap(v)) => SMMul(CrossMap(v.basicSimplify()), NumScalar(-1.0))
+      case TransposeMatrix(m) => TransposeMatrix(m.basicSimplify())
+      case _ => this
+    }
+  }
+
 }
 
-case class CrossMap(v: VectorExpr) extends MatrixExpr with SkewSymmetricMatrix
+case class CrossMap(v: VectorExpr) extends MatrixExpr with SkewSymmetricMatrix {
+  override def basicSimplify(): MatrixExpr = {
+    this match {
+      case  _ => CrossMap(v.basicSimplify())
+    }
+  }
+}
 
 //
 // Matrix Types
