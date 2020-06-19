@@ -26,11 +26,13 @@ object TreeProperties {
     // this function verifies if a given vector is part of a expression
     expr match {
         // Scalar Expr
+      case Add(a, b) => isVectorAMember(a, element) || isVectorAMember(b, element)
+      case Mul(a, b) => isVectorAMember(a, element) || isVectorAMember(b, element)
       case Dot(a, b) => isVectorAMember(a, element) || isVectorAMember(b, element)
         // Vector Expr
       case VAdd(a, b) => isVectorAMember(a, element) || isVectorAMember(b, element)
       case Cross(a, b) => isVectorAMember(a, element) || isVectorAMember(b, element)
-      case SMul(a, b) => isVectorAMember(a, element)
+      case SMul(a, b) => isVectorAMember(a, element) || isVectorAMember(b, element)
       case TransposeVector(v) => isVectorAMember(v, element)
       case MVMul(m, v) => isVectorAMember(m, element) || isVectorAMember(v, element)
         // Base case for vectors
@@ -42,7 +44,7 @@ object TreeProperties {
         // Matrix Expr
       case MAdd(a, b) => isVectorAMember(a, element) || isVectorAMember(b, element)
       case MMul(u, v) => isVectorAMember(u, element) || isVectorAMember(v, element)
-      case SMMul(m, s) => isVectorAMember(m, element)
+      case SMMul(m, s) => isVectorAMember(m, element) || isVectorAMember(s, element)
       case VVMul(a, b) => isVectorAMember(a, element) || isVectorAMember(b, element)
       case TransposeMatrix(m) => isVectorAMember(m, element)
       case CrossMap(v) =>

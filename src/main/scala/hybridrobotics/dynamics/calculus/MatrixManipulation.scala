@@ -13,10 +13,13 @@ object MatrixManipulation {
     var eqn = equation.basicSimplify()
 
     for (vector_ <- variables) {
+      val ismember = isVectorAMember(eqn, vector_)
       if (!isVectorAMember(eqn, vector_))
         coefficientMap += vector_ -> ZeroMatrix()
       else {
-        coefficientMap += vector_ -> getVariationCoefficient(eqn, vector_)
+        var tmp =  getVariationCoefficient(eqn, vector_)
+        tmp = tmp.basicSimplify() // TODO remove the temporary variable once debug is complete
+        coefficientMap += vector_ -> tmp
       }
     }
     return coefficientMap
@@ -53,7 +56,7 @@ object MatrixManipulation {
       else {
         val is_in_u = isVectorAMember(u, focusVector)
         val is_in_v = isVectorAMember(v, focusVector)
-        if (is_in_u && is_in_v) println("This should be a linear equation")
+        if (is_in_u && is_in_v) throw new Exception("Cross: both vectors cannot have the focusVector")
         if (is_in_u) return MMul(SMMul(CrossMap(v), NumScalar(-1.0)), getVariationCoefficient(u, focusVector))
         else if (is_in_v) return MMul(CrossMap(u), getVariationCoefficient(v, focusVector))
         else return ZeroMatrix()
@@ -65,7 +68,7 @@ object MatrixManipulation {
       val is_in_mat = isVectorAMember(mat, focusVector)
       val is_in_vec = isVectorAMember(vec, focusVector)
       if (is_in_vec) {
-        if (vec==focusVector)
+        if (vec == focusVector)
           return mat
         else
           return MMul(mat, getVariationCoefficient(vec, focusVector))
@@ -81,7 +84,7 @@ object MatrixManipulation {
           }
           case SMMul(sub_mat, sclr) => getVariationCoefficient(MVMul(sub_mat, SMul(vec, sclr)), focusVector)
           case CrossMap(y) => {
-            if (y==focusVector)
+            if (y == focusVector)
               return SMMul(CrossMap(vec), NumScalar(-1.0))
             else
               return MMul(SMMul(CrossMap(vec), NumScalar(-1.0)), getVariationCoefficient(y, focusVector))
@@ -91,41 +94,72 @@ object MatrixManipulation {
       else
         return ZeroMatrix()
     }
-    //    case MVMul(MMul(a, b), v) => {
-    //      val is_in_a = isVectorAMember(a, focusVector)
-    //      val is_in_b = isVectorAMember(b, focusVector)
-    //      val is_in_v = isVectorAMember(v, focusVector)
-    //      if (is_in_a) return  getVariationCoefficient(MVMul(a, MVMul(b,v)), focusVector)
-    //      else if (is_in_b) return MMul(a, getVariationCoefficient(MVMul(b,v), focusVector))
-    //      else if (is_in_v) return MMul(MMul(a,b), getVariationCoefficient(v, focusVector))
-    //      else ZeroMatrix()
-    //    }
-    //    case MVMul(u, v) => {
-    //      if (v == focusVector) {
-    //        return u
-    //      }
-    //      else {
-    //        val is_in_u = isVectorAMember(u, focusVector)
-    //        val is_in_v = isVectorAMember(v, focusVector)
-    //        if (is_in_u && is_in_v) println("This should be a linear equation")
-    //        if (is_in_u) {
-    //          return Matrix("fix this") // TODO
-    //        }
-    //        else if (is_in_v) {
-    //          return MMul(u, getVariationCoefficient(v, focusVector))
-    //        }
-    //        else {
-    //          return ZeroMatrix()
-    //        }
-    //      }
-    //    }
 
-    case SMul(v, s) => SMMul(getVariationCoefficient(v, focusVector), s)
+    case SMul(v, s) => {
+      val is_in_vec = isVectorAMember(v, focusVector)
+      val is_in_sclr = isVectorAMember(s, focusVector)
+
+      if (is_in_vec && is_in_sclr) throw new Exception("SMul: both vector and scalar cannot have the focusVector")
+      if (is_in_vec) {
+        return SMMul(getVariationCoefficient(v, focusVector), s)
+      }
+      else if (is_in_sclr) {
+        s match {
+          case Add(a, b) => {
+            val is_in_a = isVectorAMember(a, focusVector)
+            val is_in_b = isVectorAMember(b, focusVector)
+            if (is_in_a && is_in_b) {
+              MAdd(getVariationCoefficient(SMul(v,a), focusVector), getVariationCoefficient(SMul(v, b), focusVector))
+            }
+            else if (is_in_a) {
+              getVariationCoefficient(SMul(v, a), focusVector)
+            }
+            else if (is_in_b) {
+              getVariationCoefficient(SMul(v, b), focusVector)
+            }
+            else ZeroMatrix()
+            //            MVMul(MAdd(getVariationCoefficient(a, focusVector), getVariationCoefficient(b, focusVector)), v)
+          }
+
+          case Mul(a, b) => {
+            val is_in_a = isVectorAMember(a, focusVector)
+            val is_in_b = isVectorAMember(b, focusVector)
+            if (is_in_a && is_in_b) throw new Exception("Mul: both scalars cannot have the focusVector")
+            if (is_in_a) {
+              return getVariationCoefficient(SMul(SMul(v, b), a), focusVector)
+            }
+            if (is_in_b) {
+              return getVariationCoefficient(SMul(SMul(v, a),b), focusVector)
+            }
+            else ZeroMatrix()
+
+          }
+
+          case Dot(a, b) => {
+            val is_in_a = isVectorAMember(a, focusVector)
+            val is_in_b = isVectorAMember(b, focusVector)
+            if (is_in_a && is_in_b) throw new Exception("Dot: both vectors cannot have the focusVector")
+            if (is_in_a) {
+              getVariationCoefficient(MVMul(VVMul(v, TransposeVector(b)), a), focusVector)
+            }
+            else if(is_in_b) {
+              getVariationCoefficient(MVMul(VVMul(v, TransposeVector(a)), b), focusVector)
+            }
+            else ZeroMatrix()
+          }
+
+          case _ => ZeroMatrix()
+        }
+      }
+      else {
+        return ZeroMatrix()
+      }
+    }
 
     case MMul(u, v) => {
       val is_in_u = isVectorAMember(u, focusVector)
       val is_in_v = isVectorAMember(v, focusVector)
-      if (is_in_u && is_in_v) println("This should be a linear equation")
+      if (is_in_u && is_in_v) throw new Exception("MMul: both matrices cannot have the focusVector")
       if (is_in_u) {
         return Matrix("fix this") // TODO
       }

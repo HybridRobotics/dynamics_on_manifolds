@@ -82,9 +82,6 @@ trait MatrixExpr extends Expression with TimeVarying {
   // other functions
   override def basicSimplify(): MatrixExpr = {
     this match {
-      case MAdd(u, SMMul(v, NumScalar(-1.0))) =>
-        if (u == v) SMMul(u, NumScalar(0.0))
-        else MAdd(u.basicSimplify(), SMMul(v.basicSimplify(), NumScalar(-1.0)))
 
       case _ => this
     }
@@ -144,10 +141,24 @@ case class MAdd(u: MatrixExpr, v: MatrixExpr) extends MatrixExpr {
   // simplify function
   override def basicSimplify(): MatrixExpr = {
     this match {
+      // TODO update this crude simplification
       case MAdd(ZeroMatrix(), v) => v
       case MAdd(u, ZeroMatrix()) => u
-      case MAdd(u, v) => MAdd(u.basicSimplify(), v.basicSimplify())
-      case _ => this
+      case MAdd(SMMul(u, s), v) => MAdd(v, SMMul(u, s)).basicSimplify()
+      case MAdd(u, SMMul(v, s)) =>
+        if (u == v) MAdd(SMMul(u, NumScalar(1.0)), SMMul(v, s)).basicSimplify()
+        else MAdd(u.basicSimplify(), SMMul(v.basicSimplify(), s.basicSimplify()))
+      case MAdd(SMMul(u, s1), SMMul(v, s2)) =>
+        if (u == v) SMMul(v.basicSimplify(), Add(s1, s2).basicSimplify())
+        else MAdd(SMMul(u.basicSimplify(), s1.basicSimplify()), SMMul(v.basicSimplify(), s2.basicSimplify()))
+      case MAdd(u, v) =>
+        if (u == v) SMMul(u, NumScalar(2.0))
+        else MAdd(u.basicSimplify(), v.basicSimplify())
+      case MAdd(u, SMMul(v, NumScalar(-1.0))) =>
+        if (u == v) SMMul(u, NumScalar(0.0))
+        else MAdd(u.basicSimplify(), SMMul(v.basicSimplify(), NumScalar(-1.0)))
+
+      case _ => MAdd(u.basicSimplify(), v.basicSimplify())
     }
   }
 }
@@ -175,7 +186,7 @@ case class TransposeMatrix(m: MatrixExpr) extends MatrixExpr {
 case class CrossMap(v: VectorExpr) extends MatrixExpr with SkewSymmetricMatrix {
   override def basicSimplify(): MatrixExpr = {
     this match {
-      case  _ => CrossMap(v.basicSimplify())
+      case _ => CrossMap(v.basicSimplify())
     }
   }
 }
@@ -234,7 +245,7 @@ case class ConstMatrix(override val name: String) extends BaseMatrixVariable wit
 
 case class IdentityMatrix() extends BaseMatrixVariable with ConstantMatrix with SymmetricMatrix {
 
-  override val name : String = "IdentityMatrix"
+  override val name: String = "IdentityMatrix"
 
   override def diff(): MatrixExpr = SMMul(this, NumScalar(0.0))
 
@@ -248,7 +259,7 @@ case class IdentityMatrix() extends BaseMatrixVariable with ConstantMatrix with 
 
 case class ZeroMatrix() extends BaseMatrixVariable with ConstantMatrix with SymmetricMatrix {
 
-  override val name : String = "ZeroMatrix"
+  override val name: String = "ZeroMatrix"
 
   override def diff(): MatrixExpr = SMMul(this, NumScalar(0.0))
 

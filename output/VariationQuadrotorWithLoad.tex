@@ -1,0 +1,54 @@
+VariationQuadrotorWithLoad: Equations of Motion
+\begin{itemize}
+\item Load Position Equation: \begin{gather}
+((m_Q+m_L)(\ddot{x_L}+ge_3)+(-1.0)((q\cdot fR e_3)+(-1.0) ((\omega_{q}\times q)\cdot (\omega_{q}\times q)) m_Q l)q)=0
+\end{gather}
+\item Variation load position equation: \begin{gather}
+((m_Q+m_L)\delta \ddot{x_L}+(-1.0)(((q\cdot fR e_3)+(-1.0) ((\omega_{q}\times q)\cdot (\omega_{q}\times q)) m_Q l)(\xi_{q}\times q)+((((\xi_{q}\times q)\cdot fR e_3)+(q\cdot (fR {(\eta_{R})}^\times e_3+( \delta f)R e_3)))+(-1.0) ((((\delta \omega_{q}\times q)+(\omega_{q}\times (\xi_{q}\times q)))\cdot (\omega_{q}\times q))+((\omega_{q}\times q)\cdot ((\delta \omega_{q}\times q)+(\omega_{q}\times (\xi_{q}\times q))))) m_Q l)q))=0
+\end{gather}
+\item Variation Coefficients extracted
+\begin{gather}
+\Big[O\Big]\delta \Omega_{R}+\\
+\Big[(-1.0) (q {(q)}^{T}) f R (-1.0) {(e_3)}^\times\Big]\eta_{R}+\\
+\Big[(m_Q+m_L) I\Big]\delta \ddot{x_L}+\\
+\Big[O\Big]\delta \dot{x_L}+\\
+\Big[(-1.0) (2.0) (m_Ql(-1.0)q {((\omega_{q}\times q))}^{T}) (-1.0) {(q)}^\times\Big]\delta \omega_{q}+\\
+\Big[O\Big]\delta x_L+\\
+\Big[(-1.0) (((q {(fR e_3)}^{T}) (-1.0) {(q)}^\times+(2.0) (m_Ql(-1.0)q {((\omega_{q}\times q))}^{T}) {(\omega_{q})}^\times (-1.0) {(q)}^\times)+((q\cdot fR e_3)+(-1.0) ((\omega_{q}\times q)\cdot (\omega_{q}\times q)) m_Q l) (-1.0) {(q)}^\times)\Big]\xi_{q}+\\
+=0
+\end{gather}
+\item Load Attitude Equation: \begin{gather}
+((m_Q+m_L)(\ddot{x_L}+ge_3)+(-1.0)((q\cdot fR e_3)+(-1.0) ((\omega_{q}\times q)\cdot (\omega_{q}\times q)) m_Q l)q)=0
+\end{gather}
+\item Variation load attitude equation: \begin{gather}
+((m_Q+m_L)\delta \ddot{x_L}+(-1.0)(((q\cdot fR e_3)+(-1.0) ((\omega_{q}\times q)\cdot (\omega_{q}\times q)) m_Q l)(\xi_{q}\times q)+((((\xi_{q}\times q)\cdot fR e_3)+(q\cdot (fR {(\eta_{R})}^\times e_3+( \delta f)R e_3)))+(-1.0) ((((\delta \omega_{q}\times q)+(\omega_{q}\times (\xi_{q}\times q)))\cdot (\omega_{q}\times q))+((\omega_{q}\times q)\cdot ((\delta \omega_{q}\times q)+(\omega_{q}\times (\xi_{q}\times q))))) m_Q l)q))=0
+\end{gather}
+\item Variation Coefficients extracted
+\begin{gather}
+\Big[O\Big]\delta \Omega_{R}+\\
+\Big[{(q)}^\times f R (-1.0) {(e_3)}^\times\Big]\eta_{R}+\\
+\Big[I\Big]\delta \dot{\omega_{q}}+\\
+\Big[O\Big]\delta \dot{x_L}+\\
+\Big[O\Big]\delta \omega_{q}+\\
+\Big[O\Big]\delta x_L+\\
+\Big[(-1.0) {(fR e_3)}^\times (-1.0) {(q)}^\times\Big]\xi_{q}+\\
+=0
+\end{gather}
+\item Quad Attitude Equation: \begin{gather}
+((J \dot{\Omega_{R}}+(\Omega_{R}\times J \Omega_{R}))+(-1.0)M)=0
+\end{gather}
+\item Variation quad attitude equation: \begin{gather}
+((J \delta \dot{\Omega_{R}}+((\delta \Omega_{R}\times J \Omega_{R})+(\Omega_{R}\times J \delta \Omega_{R})))+(-1.0)\delta M)=0
+\end{gather}
+\item Variation Coefficients extracted
+\begin{gather}
+\Big[({(\Omega_{R})}^\times J+(-1.0) {(J \Omega_{R})}^\times)\Big]\delta \Omega_{R}+\\
+\Big[O\Big]\eta_{R}+\\
+\Big[O\Big]\delta \dot{x_L}+\\
+\Big[J\Big]\delta \dot{\Omega_{R}}+\\
+\Big[O\Big]\delta \omega_{q}+\\
+\Big[O\Big]\delta x_L+\\
+\Big[O\Big]\xi_{q}+\\
+=0
+\end{gather}
+\end{itemize}

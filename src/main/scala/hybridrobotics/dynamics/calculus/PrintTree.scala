@@ -58,9 +58,11 @@ object PrintLine {
     case ConstMatrix(s) => checkSymbols(s)
     case SkewSymMatrix(s) => "\\hatmap{" + checkSymbols(s) + "}"
     case MMul(s, r) => printMLatex(s) + " " + printMLatex(r)
+    case VVMul(u, v) => "(" + printVLatex(u) + " " + printVLatex(v) + ")"
     case DeltaM(s) => "\\delta " + printMLatex(s)
     case TransposeMatrix(s) => "{("+printMLatex(s) + ")}^{T}"
     case CrossMap(v) => "{(" + printVLatex(v) + ")}^\\times"
+    case _ => "missingMatrixChar"
   }
 
   // Print Vector to Screen
@@ -70,24 +72,27 @@ object PrintLine {
     case UnitVector(s) => checkSymbols(s)
     case ConstVector(s) => checkSymbols(s)
     case S2(s) => checkSymbols(s)
-    case VAdd(u, v) => printVLatex(u) + "+" + printVLatex(v)
-    case Cross(u, v) => printVLatex(u) + "\\times " + printVLatex(v)
-    case SMul(u, v) => printLatex(v) + " " +  printVLatex(u)
+    case VAdd(u, v) => "(" + printVLatex(u) + "+" + printVLatex(v) + ")"
+    case Cross(u, v) => "(" + printVLatex(u) + "\\times " + printVLatex(v) + ")"
+    case SMul(u, v) => printLatex(v) +  printVLatex(u)
     case MVMul(u, v) => printMLatex(u) + " " + printVLatex(v)
-//    case ZVec(s) => checkSymbols(s)
+    case TransposeVector(v) => "{("+printVLatex(v) + ")}^{T}"
+    case ZeroVector(s) => "0"
+    case _ => "missingVectorChar"
   }
 
   // Print Scalar to Screen
   def printLatex(e: ScalarExpr): String = e match {
-    case DeltaS(u) => "\\delta" + "(" + printLatex(u) + ")"
+    case DeltaS(u) => "( \\delta "+ printLatex(u) + ")"
     case VarScalar(s) => checkSymbols(s)
     case ConstScalar(s) => checkSymbols(s)
     case NumScalar(d) => "(" + d.toString + ")"
-    case Add(u, v) => printLatex(u) + "+" + printLatex(v)
+    case Add(u, v) => "(" + printLatex(u) + "+" + printLatex(v) + ")"
     case Mul(DeltaS(u), v) => printLatex(DeltaS(u)) + "* (" + printLatex(v) + ")"
     case Mul(u, v) => printLatex(u) + " " + printLatex(v)
-    case Dot(u, v) => printVLatex(u) + "\\cdot " + printVLatex(v)
+    case Dot(u, v) => "("+ printVLatex(u) + "\\cdot " + printVLatex(v) + ")"
     case Par(u) => "(" + printLatex(u) + ")"
+    case _ => "missingScalarChar"
   }
 
   // Print Matrix to Screen

@@ -9,7 +9,7 @@ import hybridrobotics.dynamics.examples._
 object Main extends App {
 
 //  ExampleSystem.main()
-  variation_linearization.SphericalPendulum.main()
+  variation_linearization.QuadrotorWithLoad.main()
 
 }
 

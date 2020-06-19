@@ -106,7 +106,7 @@ case class Cross(u: VectorExpr, v: VectorExpr) extends VectorExpr {
 
   override def basicSimplify(): VectorExpr = {
     this match {
-      case _=> Cross(u.basicSimplify(), v.basicSimplify())
+      case _ => Cross(u.basicSimplify(), v.basicSimplify())
     }
   }
 }
@@ -115,7 +115,7 @@ case class SMul(u: VectorExpr, v: ScalarExpr) extends VectorExpr {
   // u * v infix
   override def basicSimplify(): VectorExpr = {
     this match {
-      case  _ => SMul(u.basicSimplify(), v.basicSimplify())
+      case _ => SMul(u.basicSimplify(), v.basicSimplify())
     }
   }
 }
@@ -125,6 +125,12 @@ case class VAdd(u: VectorExpr, v: VectorExpr) extends VectorExpr {
 
   override def basicSimplify(): VectorExpr = {
     this match {
+      case VAdd(SMul(u, NumScalar(d)), v) =>
+        if (d==0) v.basicSimplify()
+        else VAdd(SMul(u.basicSimplify(), NumScalar(d)), v)
+      case VAdd(u, SMul(v, NumScalar(d))) =>
+        if (d == 0) u.basicSimplify()
+        else VAdd(u.basicSimplify(), SMul(v.basicSimplify(), NumScalar(d)))
       case VAdd(u, v) => VAdd(u.basicSimplify(), v.basicSimplify())
       case _ => this
     }
