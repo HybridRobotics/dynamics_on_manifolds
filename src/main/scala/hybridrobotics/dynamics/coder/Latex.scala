@@ -1,14 +1,9 @@
-// PrintTree.scala
-package hybridrobotics.dynamics.calculus
+package hybridrobotics.dynamics.coder
 
 import java.io.{File, PrintWriter}
+import hybridrobotics.dynamics.data_types._
 
-import hybridrobotics.dynamics.data_types.{MatrixExpr, VectorExpr, _}
-import hybridrobotics.dynamics.operations.Collection._
-import hybridrobotics.dynamics.operations.Separation._
-import hybridrobotics.dynamics.operations.Simplification._
-
-object PrintLine {
+object Latex {
 
   def checkSymbols(s_ugly: String): String = {
     var s = s_ugly
@@ -78,7 +73,8 @@ object PrintLine {
     case SMul(u, v) => printLatex(v) + printVLatex(u)
     case MVMul(u, v) => printMLatex(u) + " " + printVLatex(v)
     case TransposeVector(v) => "{(" + printVLatex(v) + ")}^{T}"
-    case ZeroVector(s) => "0"
+    case ZeroVector() => "0_{3,1}"
+    case OnesVector() => "1_{3,1}"
     case _ => "missingVectorChar"
   }
 
@@ -116,6 +112,8 @@ object PrintLine {
     case Vector(s) => s
     case UnitVector(s) => s
     case ConstVector(s) => s
+    case ZeroVector() => "0_{3,1}"
+    case OnesVector() => "1_{3,1}"
     case VAdd(u, v) => printVTree(u) + "+" + printVTree(v)
     case Cross(u, v) => printVTree(u) + "x" + printVTree(v)
     case SMul(u, v) => printVTree(u) + "*" + printTree(v)
@@ -132,7 +130,7 @@ object PrintLine {
     case Add(u, v) => printTree(u) + "+" + printTree(v)
     case Mul(DeltaS(u), v) => printTree(DeltaS(u)) + "* (" + printTree(v) + ")"
     case Mul(u, v) => printTree(u) + "*" + printTree(v)
-    case Dot(u, v) => "("+ printVTree(u) + ")\\cdot(" + printVTree(v) + ")"
+    case Dot(u, v) => "(" + printVTree(u) + ")\\cdot(" + printVTree(v) + ")"
     case Par(u) => "(" + printTree(u) + ")"
   }
 
@@ -186,7 +184,9 @@ object PrintLine {
 
   def print2LatexFile(equations: List[String], fileName: String): Unit = {
     val FILE_PATH = new java.io.File(".").getCanonicalPath
-    val writer = new PrintWriter(new File(FILE_PATH + File.separator + "output" + File.separator + fileName + ".tex"))
+    val directory = new File(FILE_PATH + File.separator + "output" + File.separator + "latex")
+    directory.mkdirs()
+    val writer = new PrintWriter(new File(directory+ File.separator + fileName + ".tex"))
     writer.write(fileName + ": Equations of Motion\n\\begin{itemize}\n")
     for (str <- equations) {
       writer.write("""\item """ + str + "\n")

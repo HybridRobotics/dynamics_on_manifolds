@@ -4,7 +4,7 @@ import hybridrobotics.dynamics.calculus.LagrangeHamiltonianDynamics._
 import hybridrobotics.dynamics.data_types._
 import hybridrobotics.dynamics.calculus.Simplification._
 import hybridrobotics.dynamics.calculus.MatrixManipulation._
-import hybridrobotics.dynamics.calculus.PrintLine._
+import hybridrobotics.dynamics.coder.Latex._
 
 
 object ExampleSystem {
@@ -39,23 +39,23 @@ object ExampleSystem {
     val var_equation = equation.delta()
     val variables = List(om.diff().delta(),  q.getVariationVector, om.delta(), u.delta())
 
-    val coefficients = extractVariationCoefficients(var_equation, variables)
-
-
-    // Output
-    var eqn_latex: String = "$"
-    for ((k, v) <- coefficients) {
-      val ks : String = printVLatex(k)
-      val vs : String = printMLatex(v)
-      eqn_latex = eqn_latex + "\\Big[" + vs + "\\Big]" + ks + "+"
-    }
-    eqn_latex = eqn_latex + "=0$"
-
-    print("%s\n", eqn_latex)
-    print2LatexFile(List("$"+printVLatex(equation)+"=0$",
-                          "$"+printVLatex(var_equation)+"=0$",
-                          eqn_latex),
-                    filename)
+//    val coefficients = extractVariationCoefficients(var_equation, variables)
+//
+//
+//    // Output
+//    var eqn_latex: String = "$"
+//    for ((k, v) <- coefficients) {
+//      val ks : String = printVLatex(k)
+//      val vs : String = printMLatex(v)
+//      eqn_latex = eqn_latex + "\\Big[" + vs + "\\Big]" + ks + "+"
+//    }
+//    eqn_latex = eqn_latex + "=0$"
+//
+//    print("%s\n", eqn_latex)
+//    print2LatexFile(List("$"+printVLatex(equation)+"=0$",
+//                          "$"+printVLatex(var_equation)+"=0$",
+//                          eqn_latex),
+//                    filename)
 
     println("Testing Done!")
 

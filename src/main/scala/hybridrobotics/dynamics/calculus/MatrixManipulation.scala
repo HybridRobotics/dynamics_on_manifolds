@@ -7,29 +7,48 @@ import hybridrobotics.dynamics.calculus.TreeProperties._
 object MatrixManipulation {
 
 
-  def extractVariationCoefficients(equation: VectorExpr, variables: List[VectorExpr]): Map[VectorExpr, MatrixExpr] = {
-    // TODO make it generalized to scalar and matrices, currently only vectors
-    var coefficientMap: Map[VectorExpr, MatrixExpr] = Map()
-
+  def extractVariationCoefficients(equation: VectorExpr, variables: (List[ScalarExpr], List[VectorExpr], List[MatrixExpr])): (Map[ScalarExpr, VectorExpr], Map[VectorExpr, MatrixExpr], Map[MatrixExpr, MatrixExpr]) = {
     var eqn = equation.basicSimplify()
     //    eqn = expandVectorExpr(eqn)
     //    eqn = eqn.basicSimplify()
 
-    for (vector_ <- variables) {
-      val ismember2 = isVectorAMember(eqn, vector_)
-      val ismember = eqn.is_member(vector_)
-      if (!ismember)
-        coefficientMap += vector_ -> ZeroMatrix()
+    // variables List(output_variables, state_variables, input_variables)
+    var sclrCoeffMap: Map[ScalarExpr, VectorExpr] = Map()
+    for (scalar_ <- variables._1) {
+      if (!eqn.is_member(scalar_)) {
+        sclrCoeffMap += scalar_ -> ZeroVector()
+      }
       else {
-        var tmp = getVariationCoefficient(eqn, vector_)
-        tmp = tmp.basicSimplify() // TODO remove the temporary variable once debug is complete
-        coefficientMap += vector_ -> tmp
+        sclrCoeffMap += scalar_ -> getScalarCoefficient(eqn, scalar_).basicSimplify()
       }
     }
-    return coefficientMap
+
+    var vecCoeffMap: Map[VectorExpr, MatrixExpr] = Map()
+    for (vector_ <- variables._2) {
+      val ismember = eqn.is_member(vector_)
+      if (!ismember)
+        vecCoeffMap += vector_ -> ZeroMatrix()
+      else {
+        //        var tmp = getVectorCoefficient(eqn, vector_)
+        //        tmp = tmp.basicSimplify() // TODO remove the temporary variable once debug is complete
+        vecCoeffMap += vector_ -> getVectorCoefficient(eqn, vector_).basicSimplify()
+      }
+    }
+
+    var matCoeffMap: Map[MatrixExpr, MatrixExpr] = Map()
+    for (matrix_ <- variables._3) {
+      if (!eqn.is_member(matrix_)) {
+        matCoeffMap += matrix_ -> ZeroMatrix()
+      }
+      else {
+        matCoeffMap += matrix_ -> getMatrixCoefficient(eqn, matrix_).basicSimplify()
+      }
+    }
+
+    return (sclrCoeffMap, vecCoeffMap, matCoeffMap)
   }
 
-  def getVariationCoefficient(expr: Any, focusVector: VectorExpr): MatrixExpr = expr match {
+  def getVectorCoefficient(expr: Any, focusVector: VectorExpr): MatrixExpr = expr match {
     // Scalar Expr
     // TODO write case for Dot(a.b)c
 
@@ -39,14 +58,14 @@ object MatrixManipulation {
       val is_in_v = isVectorAMember(v, focusVector)
 
       if (is_in_u && is_in_v) {
-        val tmp = MAdd(getVariationCoefficient(u, focusVector), getVariationCoefficient(v, focusVector))
+        val tmp = MAdd(getVectorCoefficient(u, focusVector), getVectorCoefficient(v, focusVector))
         return tmp
       }
       else if (is_in_u) {
-        return getVariationCoefficient(u, focusVector)
+        return getVectorCoefficient(u, focusVector)
       }
       else if (is_in_v) {
-        return getVariationCoefficient(v, focusVector)
+        return getVectorCoefficient(v, focusVector)
       }
       else {
         ZeroMatrix()
@@ -61,8 +80,8 @@ object MatrixManipulation {
         val is_in_u = isVectorAMember(u, focusVector)
         val is_in_v = isVectorAMember(v, focusVector)
         if (is_in_u && is_in_v) throw new Exception("Cross: both vectors cannot have the focusVector")
-        if (is_in_u) return MMul(SMMul(CrossMap(v), NumScalar(-1.0)), getVariationCoefficient(u, focusVector))
-        else if (is_in_v) return MMul(CrossMap(u), getVariationCoefficient(v, focusVector))
+        if (is_in_u) return MMul(SMMul(CrossMap(v), NumScalar(-1.0)), getVectorCoefficient(u, focusVector))
+        else if (is_in_v) return MMul(CrossMap(u), getVectorCoefficient(v, focusVector))
         else return ZeroMatrix()
       }
     }
@@ -75,7 +94,7 @@ object MatrixManipulation {
         if (vec == focusVector)
           return mat
         else
-          return MMul(mat, getVariationCoefficient(vec, focusVector))
+          return MMul(mat, getVectorCoefficient(vec, focusVector))
       }
       else if (is_in_mat) {
         mat match {
@@ -83,19 +102,19 @@ object MatrixManipulation {
             val is_in_lmat = isVectorAMember(lmat, focusVector)
             val is_in_rmat = isVectorAMember(rmat, focusVector)
             if (is_in_lmat & is_in_rmat)
-              return getVariationCoefficient(MVMul(lmat, vec), focusVector) + getVariationCoefficient(MVMul(rmat, vec), focusVector)
+              return getVectorCoefficient(MVMul(lmat, vec), focusVector) + getVectorCoefficient(MVMul(rmat, vec), focusVector)
             else if (is_in_lmat)
-              return getVariationCoefficient(MVMul(lmat, vec), focusVector)
+              return getVectorCoefficient(MVMul(lmat, vec), focusVector)
             else if (is_in_rmat)
-              return getVariationCoefficient(MVMul(rmat, vec), focusVector)
+              return getVectorCoefficient(MVMul(rmat, vec), focusVector)
             else
               ZeroMatrix()
           }
           case MMul(lmat, rmat) => {
             val is_in_lmat = isVectorAMember(lmat, focusVector)
             val is_in_rmat = isVectorAMember(rmat, focusVector)
-            if (is_in_lmat) return getVariationCoefficient(MVMul(lmat, MVMul(rmat, vec)), focusVector)
-            else if (is_in_rmat) return MMul(lmat, getVariationCoefficient(MVMul(rmat, vec), focusVector))
+            if (is_in_lmat) return getVectorCoefficient(MVMul(lmat, MVMul(rmat, vec)), focusVector)
+            else if (is_in_rmat) return MMul(lmat, getVectorCoefficient(MVMul(rmat, vec), focusVector))
             else ZeroMatrix()
           }
           case SMMul(sub_mat, sclr) => {
@@ -103,9 +122,9 @@ object MatrixManipulation {
             val is_in_sclr = isVectorAMember(sclr, focusVector)
             if (is_in_sub_mat && is_in_sclr) throw new Exception("SMMul: both matrix and scalar cannot have the focusVector")
             if (is_in_sub_mat)
-              getVariationCoefficient(MVMul(sub_mat, SMul(vec, sclr)), focusVector)
+              getVectorCoefficient(MVMul(sub_mat, SMul(vec, sclr)), focusVector)
             else if (is_in_sclr)
-              MMul(sub_mat, getVariationCoefficient(SMul(vec, sclr), focusVector))
+              MMul(sub_mat, getVectorCoefficient(SMul(vec, sclr), focusVector))
             else
               ZeroMatrix()
           }
@@ -114,21 +133,21 @@ object MatrixManipulation {
             val is_in_v = isVectorAMember(v, focusVector)
             if (is_in_u && is_in_v) throw new Exception("VVMul: both vectors cannot have the focusVector")
             if (is_in_u)
-              return MMul(SMMul(IdentityMatrix(), Dot(v.v, vec)), getVariationCoefficient(u, focusVector) )// getVariationCoefficient(SMul(u, Dot(v, vec)), focusVector)
+              return MMul(SMMul(IdentityMatrix(), Dot(v.v, vec)), getVectorCoefficient(u, focusVector)) // getVectorCoefficient(SMul(u, Dot(v, vec)), focusVector)
             else if (is_in_v)
-              return MMul(VVMul(u, TransposeVector(vec)), getVariationCoefficient(v.v, focusVector))
+              return MMul(VVMul(u, TransposeVector(vec)), getVectorCoefficient(v.v, focusVector))
             else
               ZeroMatrix()
           }
           case TransposeMatrix(sub_mat) => {
             val tmp = TransposeMatrix(sub_mat).basicSimplify()
-            getVariationCoefficient(MVMul(tmp, vec), focusVector)
+            getVectorCoefficient(MVMul(tmp, vec), focusVector)
           }
           case CrossMap(y) => {
             if (y == focusVector)
               return SMMul(CrossMap(vec), NumScalar(-1.0))
             else
-              return MMul(SMMul(CrossMap(vec), NumScalar(-1.0)), getVariationCoefficient(y, focusVector))
+              return MMul(SMMul(CrossMap(vec), NumScalar(-1.0)), getVectorCoefficient(y, focusVector))
           }
         }
       }
@@ -142,7 +161,7 @@ object MatrixManipulation {
 
       if (is_in_vec && is_in_sclr) throw new Exception("SMul: both vector and scalar cannot have the focusVector")
       if (is_in_vec) {
-        return SMMul(getVariationCoefficient(v, focusVector), s)
+        return SMMul(getVectorCoefficient(v, focusVector), s)
       }
       else if (is_in_sclr) {
         s match {
@@ -150,45 +169,41 @@ object MatrixManipulation {
             val is_in_a = isVectorAMember(a, focusVector)
             val is_in_b = isVectorAMember(b, focusVector)
             if (is_in_a && is_in_b) {
-              MAdd(getVariationCoefficient(SMul(v, a), focusVector), getVariationCoefficient(SMul(v, b), focusVector))
+              MAdd(getVectorCoefficient(SMul(v, a), focusVector), getVectorCoefficient(SMul(v, b), focusVector))
             }
             else if (is_in_a) {
-              getVariationCoefficient(SMul(v, a), focusVector)
+              getVectorCoefficient(SMul(v, a), focusVector)
             }
             else if (is_in_b) {
-              getVariationCoefficient(SMul(v, b), focusVector)
+              getVectorCoefficient(SMul(v, b), focusVector)
             }
             else ZeroMatrix()
-            //            MVMul(MAdd(getVariationCoefficient(a, focusVector), getVariationCoefficient(b, focusVector)), v)
+            //            MVMul(MAdd(getVectorCoefficient(a, focusVector), getVectorCoefficient(b, focusVector)), v)
           }
-
           case Mul(a, b) => {
             val is_in_a = isVectorAMember(a, focusVector)
             val is_in_b = isVectorAMember(b, focusVector)
             if (is_in_a && is_in_b) throw new Exception("Mul: both scalars cannot have the focusVector")
             if (is_in_a) {
-              return getVariationCoefficient(SMul(SMul(v, b), a), focusVector)
+              return getVectorCoefficient(SMul(SMul(v, b), a), focusVector)
             }
             if (is_in_b) {
-              return getVariationCoefficient(SMul(SMul(v, a), b), focusVector)
+              return getVectorCoefficient(SMul(SMul(v, a), b), focusVector)
             }
             else ZeroMatrix()
-
           }
-
           case Dot(a, b) => {
             val is_in_a = isVectorAMember(a, focusVector)
             val is_in_b = isVectorAMember(b, focusVector)
             if (is_in_a && is_in_b) throw new Exception("Dot: both vectors cannot have the focusVector")
             if (is_in_a) {
-              getVariationCoefficient(MVMul(VVMul(v, TransposeVector(b)), a), focusVector)
+              getVectorCoefficient(MVMul(VVMul(v, TransposeVector(b)), a), focusVector)
             }
             else if (is_in_b) {
-              getVariationCoefficient(MVMul(VVMul(v, TransposeVector(a)), b), focusVector)
+              getVectorCoefficient(MVMul(VVMul(v, TransposeVector(a)), b), focusVector)
             }
             else ZeroMatrix()
           }
-
           case _ => ZeroMatrix()
         }
       }
@@ -202,31 +217,58 @@ object MatrixManipulation {
       val is_in_v = isVectorAMember(v, focusVector)
       if (is_in_u && is_in_v) throw new Exception("MMul: both matrices cannot have the focusVector")
       if (is_in_u) {
-        return Matrix("fix this") // TODO
+        return Matrix("fix this") // TODO I shouldn't encounter this case
       }
       else if (is_in_v) {
-        return MMul(u, getVariationCoefficient(v, focusVector))
+        return MMul(u, getVectorCoefficient(v, focusVector))
       }
       else {
         return ZeroMatrix()
       }
     }
 
-    case expr: VectorExpr =>
+    case expr: VectorExpr => {
       if (expr == focusVector) IdentityMatrix()
       else if (!isVectorAMember(expr, focusVector)) ZeroMatrix()
-      else getVariationCoefficient(expr, focusVector)
+      else getVectorCoefficient(expr, focusVector)
+    }
 
     case _ => IdentityMatrix()
   }
 
+  def getScalarCoefficient(expr: Any): VectorExpr = { // TODO complete getScalarCoefficient
+    expr match {
+      // Scalar Expr
+
+      // Vector Expr
+
+      // Matrix Expr
+
+      // Default
+      case _ => OnesVector()
+    }
+  }
+
+  def getMatrixCoefficient(expr: Any): MatrixExpr = { // TODO complete getMatrixCoefficient
+    expr match {
+      // Scalar Expr
+
+      // Vector Expr
+
+      // Matrix Expr
+
+      // Default
+      case _ => IdentityMatrix()
+    }
+  }
+
   def replaceVectorExpr(expr: Any, oldVector: VectorExpr, newVector: VectorExpr): Any = {
-    // TODO replace vectors
+    // TODO replaceVectorExpr
     return expr
   }
 
   def replaceMatrixExpr(expr: MatrixExpr, oldMatrix: MatrixExpr, newMatrix: MatrixExpr): Any = {
-    // TODO
+    // TODO replaceMatrixExpr
     return expr
   }
 

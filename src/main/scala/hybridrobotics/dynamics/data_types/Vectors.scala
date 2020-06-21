@@ -239,13 +239,24 @@ case class ConstVector(override val name: String) extends BaseVectorVariable wit
 
 //case class AVec(s: String, u: VectorExpr) extends VectorExpr // holds symbolic reference for large vector
 
-case class ZeroVector(override val name: String) extends BaseVectorVariable {
+case class ZeroVector() extends BaseVectorVariable with ConstantVector {
+  override val name : String = "ZeroVector"
   // ZeroVector Vector
   override def diff(): VectorExpr = SMul(this, NumScalar(0))
 
   override def delta(): VectorExpr = SMul(this, NumScalar(0.0))
 
-  override def d: VectorExpr = ZeroVector(this.name + "_d")
+  override def d: VectorExpr = ZeroVector()
+}
+
+case class OnesVector() extends BaseVectorVariable  with ConstantVector {
+  override val name : String = "ZeroVector"
+  // ZeroVector Vector
+  override def diff(): VectorExpr = ZeroVector()
+
+  override def delta(): VectorExpr = ZeroVector()
+
+  override def d: VectorExpr = OnesVector()
 }
 
 case class SkewMatVector(override val name: String) extends BaseVectorVariable {
