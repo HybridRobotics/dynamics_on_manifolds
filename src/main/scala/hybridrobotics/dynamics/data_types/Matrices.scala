@@ -62,6 +62,25 @@ trait MatrixExpr extends Expression with TimeVarying {
 
   override def getVariation: Any = this.delta() // TODO fix this datatype dependency issue
 
+  // is a element in expression Expr
+  def is_member(element: Any): Boolean = {
+    // this function verifies if a given vector is part of a expression
+    this match {
+      // Matrix Expr
+      case MAdd(a, b) => a.is_member(element) || b.is_member(element)
+      case MMul(u, v) => u.is_member(element) || v.is_member(element)
+      case SMMul(m, s) => m.is_member(element) || s.is_member(element)
+      case VVMul(a, b) => a.is_member(element) || b.is_member(element)
+      case TransposeMatrix(m) => m.is_member(element)
+      case CrossMap(v) => v.is_member(element)
+      case _ =>
+        if (this == element)
+          return true
+        else
+          return false
+    }
+  }
+
   // Algebra (Infix) operators
   def *(u: ScalarExpr): MatrixExpr = SMMul(this, u)
 
@@ -144,13 +163,17 @@ case class MAdd(u: MatrixExpr, v: MatrixExpr) extends MatrixExpr {
       // TODO update this crude simplification
       case MAdd(ZeroMatrix(), v) => v
       case MAdd(u, ZeroMatrix()) => u
-      case MAdd(SMMul(u, s), v) => MAdd(v, SMMul(u, s)).basicSimplify()
-      case MAdd(u, SMMul(v, s)) =>
-        if (u == v) MAdd(SMMul(u, NumScalar(1.0)), SMMul(v, s)).basicSimplify()
-        else MAdd(u.basicSimplify(), SMMul(v.basicSimplify(), s.basicSimplify()))
+
       case MAdd(SMMul(u, s1), SMMul(v, s2)) =>
         if (u == v) SMMul(v.basicSimplify(), Add(s1, s2).basicSimplify())
         else MAdd(SMMul(u.basicSimplify(), s1.basicSimplify()), SMMul(v.basicSimplify(), s2.basicSimplify()))
+
+      case MAdd(SMMul(u, s), v) => MAdd(v, SMMul(u, s)).basicSimplify()
+
+      case MAdd(u, SMMul(v, s)) =>
+        if (u == v) MAdd(SMMul(u, NumScalar(1.0)), SMMul(v, s)).basicSimplify()
+        else MAdd(u.basicSimplify(), SMMul(v.basicSimplify(), s.basicSimplify()))
+
       case MAdd(u, v) =>
         if (u == v) SMMul(u, NumScalar(2.0))
         else MAdd(u.basicSimplify(), v.basicSimplify())

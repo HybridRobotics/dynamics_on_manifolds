@@ -1,6 +1,7 @@
 package hybridrobotics.dynamics.calculus
 
 import hybridrobotics.dynamics.data_types._
+import hybridrobotics.dynamics.calculus.Expansion._
 import hybridrobotics.dynamics.calculus.TreeProperties._
 
 object MatrixManipulation {
@@ -11,13 +12,16 @@ object MatrixManipulation {
     var coefficientMap: Map[VectorExpr, MatrixExpr] = Map()
 
     var eqn = equation.basicSimplify()
+    //    eqn = expandVectorExpr(eqn)
+    //    eqn = eqn.basicSimplify()
 
     for (vector_ <- variables) {
-      val ismember = isVectorAMember(eqn, vector_)
-      if (!isVectorAMember(eqn, vector_))
+      val ismember2 = isVectorAMember(eqn, vector_)
+      val ismember = eqn.is_member(vector_)
+      if (!ismember)
         coefficientMap += vector_ -> ZeroMatrix()
       else {
-        var tmp =  getVariationCoefficient(eqn, vector_)
+        var tmp = getVariationCoefficient(eqn, vector_)
         tmp = tmp.basicSimplify() // TODO remove the temporary variable once debug is complete
         coefficientMap += vector_ -> tmp
       }
@@ -75,6 +79,18 @@ object MatrixManipulation {
       }
       else if (is_in_mat) {
         mat match {
+          case MAdd(lmat, rmat) => {
+            val is_in_lmat = isVectorAMember(lmat, focusVector)
+            val is_in_rmat = isVectorAMember(rmat, focusVector)
+            if (is_in_lmat & is_in_rmat)
+              return getVariationCoefficient(MVMul(lmat, vec), focusVector) + getVariationCoefficient(MVMul(rmat, vec), focusVector)
+            else if (is_in_lmat)
+              return getVariationCoefficient(MVMul(lmat, vec), focusVector)
+            else if (is_in_rmat)
+              return getVariationCoefficient(MVMul(rmat, vec), focusVector)
+            else
+              ZeroMatrix()
+          }
           case MMul(lmat, rmat) => {
             val is_in_lmat = isVectorAMember(lmat, focusVector)
             val is_in_rmat = isVectorAMember(rmat, focusVector)
@@ -82,7 +98,32 @@ object MatrixManipulation {
             else if (is_in_rmat) return MMul(lmat, getVariationCoefficient(MVMul(rmat, vec), focusVector))
             else ZeroMatrix()
           }
-          case SMMul(sub_mat, sclr) => getVariationCoefficient(MVMul(sub_mat, SMul(vec, sclr)), focusVector)
+          case SMMul(sub_mat, sclr) => {
+            val is_in_sub_mat = isVectorAMember(sub_mat, focusVector)
+            val is_in_sclr = isVectorAMember(sclr, focusVector)
+            if (is_in_sub_mat && is_in_sclr) throw new Exception("SMMul: both matrix and scalar cannot have the focusVector")
+            if (is_in_sub_mat)
+              getVariationCoefficient(MVMul(sub_mat, SMul(vec, sclr)), focusVector)
+            else if (is_in_sclr)
+              MMul(sub_mat, getVariationCoefficient(SMul(vec, sclr), focusVector))
+            else
+              ZeroMatrix()
+          }
+          case VVMul(u, v) => {
+            val is_in_u = isVectorAMember(u, focusVector)
+            val is_in_v = isVectorAMember(v, focusVector)
+            if (is_in_u && is_in_v) throw new Exception("VVMul: both vectors cannot have the focusVector")
+            if (is_in_u)
+              return MMul(SMMul(IdentityMatrix(), Dot(v.v, vec)), getVariationCoefficient(u, focusVector) )// getVariationCoefficient(SMul(u, Dot(v, vec)), focusVector)
+            else if (is_in_v)
+              return MMul(VVMul(u, TransposeVector(vec)), getVariationCoefficient(v.v, focusVector))
+            else
+              ZeroMatrix()
+          }
+          case TransposeMatrix(sub_mat) => {
+            val tmp = TransposeMatrix(sub_mat).basicSimplify()
+            getVariationCoefficient(MVMul(tmp, vec), focusVector)
+          }
           case CrossMap(y) => {
             if (y == focusVector)
               return SMMul(CrossMap(vec), NumScalar(-1.0))
@@ -109,7 +150,7 @@ object MatrixManipulation {
             val is_in_a = isVectorAMember(a, focusVector)
             val is_in_b = isVectorAMember(b, focusVector)
             if (is_in_a && is_in_b) {
-              MAdd(getVariationCoefficient(SMul(v,a), focusVector), getVariationCoefficient(SMul(v, b), focusVector))
+              MAdd(getVariationCoefficient(SMul(v, a), focusVector), getVariationCoefficient(SMul(v, b), focusVector))
             }
             else if (is_in_a) {
               getVariationCoefficient(SMul(v, a), focusVector)
@@ -129,7 +170,7 @@ object MatrixManipulation {
               return getVariationCoefficient(SMul(SMul(v, b), a), focusVector)
             }
             if (is_in_b) {
-              return getVariationCoefficient(SMul(SMul(v, a),b), focusVector)
+              return getVariationCoefficient(SMul(SMul(v, a), b), focusVector)
             }
             else ZeroMatrix()
 
@@ -142,7 +183,7 @@ object MatrixManipulation {
             if (is_in_a) {
               getVariationCoefficient(MVMul(VVMul(v, TransposeVector(b)), a), focusVector)
             }
-            else if(is_in_b) {
+            else if (is_in_b) {
               getVariationCoefficient(MVMul(VVMul(v, TransposeVector(a)), b), focusVector)
             }
             else ZeroMatrix()
@@ -179,4 +220,18 @@ object MatrixManipulation {
     case _ => IdentityMatrix()
   }
 
+  def replaceVectorExpr(expr: Any, oldVector: VectorExpr, newVector: VectorExpr): Any = {
+    // TODO replace vectors
+    return expr
+  }
+
+  def replaceMatrixExpr(expr: MatrixExpr, oldMatrix: MatrixExpr, newMatrix: MatrixExpr): Any = {
+    // TODO
+    return expr
+  }
+
+  def replaceScalrExpr(expr: ScalarExpr, oldScalar: ScalarExpr, newScalr: MatrixExpr): Any = {
+    // TODO may be we can make this an inbuilt vector
+    return expr
+  }
 }

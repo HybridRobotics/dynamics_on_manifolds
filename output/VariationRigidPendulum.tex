@@ -1,6 +1,13 @@
 VariationRigidPendulum: Equations of Motion
 \begin{itemize}
-\item $J \dot{\Omega_{R}}+\Omega_{R}\times J \Omega_{R}+g m \rho\times {(R)}^{T} e3+(-1.0) u=0$
-\item $J \delta \dot{\Omega_{R}}+\delta \Omega_{R}\times J \Omega_{R}+\Omega_{R}\times J \delta \Omega_{R}+g m \rho\times {(R {(\eta_{R})}^\times)}^{T} e3+(-1.0) \delta u=0$
-\item $\Big[J\Big]\delta \dot{\Omega_{R}}+\Big[((-1.0) {(J \Omega_{R})}^\times+{(\Omega_{R})}^\times J)\Big]\delta \Omega_{R}+\Big[g m {(\rho)}^\times (-1.0) {((-1.0) {(R)}^{T} e3)}^\times\Big]\eta_{R}+\Big[(-1.0) I\Big]\delta u+=0$
+\item $(((J \dot{\Omega_{R}}+(\Omega_{R}\times J \Omega_{R}))+gm(\rho\times {(R)}^{T} e3))+(-1.0)u)=0$
+\item $(((J \delta \dot{\Omega_{R}}+((\delta \Omega_{R}\times J \Omega_{R})+(\Omega_{R}\times J \delta \Omega_{R})))+gm(\rho\times {(R {(\eta_{R})}^\times)}^{T} e3))+(-1.0)\delta u)=0$
+\item Variation Coefficients extracted
+\begin{gather}
+\Big[J\Big]\delta \dot{\Omega_{R}}+\nonumber\\
+\Big[({(\Omega_{R})}^\times J+(-1.0) {(J \Omega_{R})}^\times)\Big]\delta \Omega_{R}+\nonumber\\
+\Big[g m {(\rho)}^\times (-1.0) {((-1.0){(R)}^{T} e3)}^\times\Big]\eta_{R}+\nonumber\\
+\Big[(-1.0) I\Big]\delta u+\nonumber\\
+=0
+\end{gather}
 \end{itemize}

@@ -1,0 +1,58 @@
+VariationMultipleQuadrotorRigidPayload: Equations of Motion
+\begin{itemize}
+\item Variation Coefficients extracted
+\begin{gather}
+\Big[O\Big]\delta \omega_{q_i}+\nonumber\\
+\Big[(\big((q_i)\cdot( m_i(\ddot{x_L}+ge_3))\big) I (-1.0) {(q_i)}^\times+(q_i {(m_i(\ddot{x_L}+ge_3))}^{T}) (-1.0) {(q_i)}^\times)\Big]\xi_{q_i}+\nonumber\\
+\Big[O\Big]\eta_{R_i}+\nonumber\\
+\Big[(m_L I+m_i (q_i {(q_i)}^{T}))\Big]\delta \ddot{x_L}+\nonumber\\
+\Big[O\Big]\delta \Omega_{R_L}+\nonumber\\
+\Big[O\Big]\delta \dot{\Omega_{R_L}}+\nonumber\\
+\Big[O\Big]\eta_{R_L}+\nonumber\\
+=0
+\end{gather}
+\item Variation Coefficients extracted
+\begin{gather}
+\Big[O\Big]\delta \omega_{q_i}+\nonumber\\
+\Big[(\big(({(R_L)}^{T} q_i)\cdot( {(r_i)}^\times (-1.0) m_i\dot{\Omega_{R_L}})\big) I (-1.0) {(q_i)}^\times+(q_i {({(r_i)}^\times (-1.0) m_i\dot{\Omega_{R_L}})}^{T}) {(R_L)}^{T} (-1.0) {(q_i)}^\times)\Big]\xi_{q_i}+\nonumber\\
+\Big[O\Big]\eta_{R_i}+\nonumber\\
+\Big[O\Big]\delta \ddot{x_L}+\nonumber\\
+\Big[O\Big]\delta \Omega_{R_L}+\nonumber\\
+\Big[(-1.0) m_i (q_i {({(R_L)}^{T} q_i)}^{T}) {(r_i)}^\times\Big]\delta \dot{\Omega_{R_L}}+\nonumber\\
+\Big[(q_i {({(r_i)}^\times (-1.0) m_i\dot{\Omega_{R_L}})}^{T}) (-1.0) {((-1.0){(R_L)}^{T} q_i)}^\times\Big]\eta_{R_L}+\nonumber\\
+=0
+\end{gather}
+\item Variation Coefficients extracted
+\begin{gather}
+\Big[O\Big]\delta \omega_{q_i}+\nonumber\\
+\Big[(\big((q_i)\cdot( m_il_i\frac{f_i}{m_il_i}R_i e_3)\big) I (-1.0) {(q_i)}^\times+(q_i {(m_il_i\frac{f_i}{m_il_i}R_i e_3)}^{T}) (-1.0) {(q_i)}^\times)\Big]\xi_{q_i}+\nonumber\\
+\Big[l_i m_i (q_i {(q_i)}^{T}) \frac{f_i}{m_il_i} R_i (-1.0) {(e_3)}^\times\Big]\eta_{R_i}+\nonumber\\
+\Big[O\Big]\delta \ddot{x_L}+\nonumber\\
+\Big[O\Big]\delta \Omega_{R_L}+\nonumber\\
+\Big[O\Big]\delta \dot{\Omega_{R_L}}+\nonumber\\
+\Big[O\Big]\eta_{R_L}+\nonumber\\
+=0
+\end{gather}
+\item Variation Coefficients extracted
+\begin{gather}
+\Big[(2.0) (l_im_i(-1.0)q_i {(\omega_{q_i})}^{T})\Big]\delta \omega_{q_i}+\nonumber\\
+\Big[((m_i(-1.0)q_i {({(\Omega_{R_L})}^\times {(\Omega_{R_L})}^\times r_i)}^{T}) {(R_L)}^{T} (-1.0) {(q_i)}^\times+(-1.0) (\big(({(R_L)}^{T} q_i)\cdot( {(\Omega_{R_L})}^\times {(\Omega_{R_L})}^\times r_i)\big)+\big((\omega_{q_i})\cdot( \omega_{q_i})\big) l_i) m_i (-1.0) {(q_i)}^\times)\Big]\xi_{q_i}+\nonumber\\
+\Big[O\Big]\eta_{R_i}+\nonumber\\
+\Big[O\Big]\delta \ddot{x_L}+\nonumber\\
+\Big[(m_i(-1.0)q_i {({(R_L)}^{T} q_i)}^{T}) ({(\Omega_{R_L})}^\times (-1.0) {(r_i)}^\times+(-1.0) {({(\Omega_{R_L})}^\times r_i)}^\times)\Big]\delta \Omega_{R_L}+\nonumber\\
+\Big[O\Big]\delta \dot{\Omega_{R_L}}+\nonumber\\
+\Big[(m_i(-1.0)q_i {({(\Omega_{R_L})}^\times {(\Omega_{R_L})}^\times r_i)}^{T}) (-1.0) {((-1.0){(R_L)}^{T} q_i)}^\times\Big]\eta_{R_L}+\nonumber\\
+=0
+\end{gather}
+\item Variation Coefficients extracted
+\begin{gather}
+\Big[(-1.0) (2.0) (l_im_i(-1.0)q_i {(\omega_{q_i})}^{T})\Big]\delta \omega_{q_i}+\nonumber\\
+\Big[(((\big((q_i)\cdot( m_i(\ddot{x_L}+ge_3))\big) I (-1.0) {(q_i)}^\times+(q_i {(m_i(\ddot{x_L}+ge_3))}^{T}) (-1.0) {(q_i)}^\times)+(\big(({(R_L)}^{T} q_i)\cdot( {(r_i)}^\times (-1.0) m_i\dot{\Omega_{R_L}})\big) I (-1.0) {(q_i)}^\times+(q_i {({(r_i)}^\times (-1.0) m_i\dot{\Omega_{R_L}})}^{T}) {(R_L)}^{T} (-1.0) {(q_i)}^\times))+(-1.0) ((\big((q_i)\cdot( m_il_i\frac{f_i}{m_il_i}R_i e_3)\big) I (-1.0) {(q_i)}^\times+(q_i {(m_il_i\frac{f_i}{m_il_i}R_i e_3)}^{T}) (-1.0) {(q_i)}^\times)+((m_i(-1.0)q_i {({(\Omega_{R_L})}^\times {(\Omega_{R_L})}^\times r_i)}^{T}) {(R_L)}^{T} (-1.0) {(q_i)}^\times+(-1.0) (\big(({(R_L)}^{T} q_i)\cdot( {(\Omega_{R_L})}^\times {(\Omega_{R_L})}^\times r_i)\big)+\big((\omega_{q_i})\cdot( \omega_{q_i})\big) l_i) m_i (-1.0) {(q_i)}^\times)))\Big]\xi_{q_i}+\nonumber\\
+\Big[(-1.0) l_i m_i (q_i {(q_i)}^{T}) \frac{f_i}{m_il_i} R_i (-1.0) {(e_3)}^\times\Big]\eta_{R_i}+\nonumber\\
+\Big[(m_L I+m_i (q_i {(q_i)}^{T}))\Big]\delta \ddot{x_L}+\nonumber\\
+\Big[(-1.0) (m_i(-1.0)q_i {({(R_L)}^{T} q_i)}^{T}) ({(\Omega_{R_L})}^\times (-1.0) {(r_i)}^\times+(-1.0) {({(\Omega_{R_L})}^\times r_i)}^\times)\Big]\delta \Omega_{R_L}+\nonumber\\
+\Big[(-1.0) m_i (q_i {({(R_L)}^{T} q_i)}^{T}) {(r_i)}^\times\Big]\delta \dot{\Omega_{R_L}}+\nonumber\\
+\Big[((q_i {({(r_i)}^\times (-1.0) m_i\dot{\Omega_{R_L}})}^{T}) (-1.0) {((-1.0){(R_L)}^{T} q_i)}^\times+(-1.0) (m_i(-1.0)q_i {({(\Omega_{R_L})}^\times {(\Omega_{R_L})}^\times r_i)}^{T}) (-1.0) {((-1.0){(R_L)}^{T} q_i)}^\times)\Big]\eta_{R_L}+\nonumber\\
+=0
+\end{gather}
+\end{itemize}

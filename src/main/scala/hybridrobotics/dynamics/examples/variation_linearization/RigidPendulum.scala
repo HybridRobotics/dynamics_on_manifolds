@@ -1,7 +1,7 @@
 package hybridrobotics.dynamics.examples.variation_linearization
 
 import hybridrobotics.dynamics.calculus.MatrixManipulation.extractVariationCoefficients
-import hybridrobotics.dynamics.calculus.PrintLine.{print2LatexFile, printMLatex, printVLatex}
+import hybridrobotics.dynamics.calculus.PrintLine.{variationCoeffs2LatexEquation, print2LatexFile, printMLatex, printVLatex}
 import hybridrobotics.dynamics.data_types._
 
 object RigidPendulum {
@@ -22,7 +22,7 @@ object RigidPendulum {
     val u = Vector("u")
     val rho = ConstVector("\\rho")
 
-    val equation = J ** Om.diff() + Cross(Om, J ** Om) + Cross(rho, MVMul(R.T, e3))*m*g - u
+    val equation = J ** Om.diff() + Cross(Om, J ** Om) + Cross(rho, MVMul(R.T, e3)) * m * g - u
     val var_equation = equation.delta()
     val variables = List(Om.diff().delta(), Om.delta(), eta, DeltaV(u))
 
@@ -32,16 +32,8 @@ object RigidPendulum {
     println("ComputationTime:" + (endTime - startTime) / 1000000)
 
     // Output
-    var eqn_latex: String = "$"
-    for ((k, v) <- coefficients) {
-      val ks: String = printVLatex(k)
-      val vs: String = printMLatex(v)
-      eqn_latex = eqn_latex + "\\Big[" + vs + "\\Big]" + ks + "+"
-    }
-    eqn_latex = eqn_latex + "=0$"
-    print("%s\n", eqn_latex)
-
-
+    val eqn_latex: String = variationCoeffs2LatexEquation(coefficients)
+    println("%s", eqn_latex)
 
     var list_of_eqns: List[String] = List("$" + printVLatex(equation) + "=0$",
       "$" + printVLatex(var_equation) + "=0$",

@@ -1,5 +1,6 @@
 package hybridrobotics.dynamics.data_types
-
+import hybridrobotics.dynamics.data_types.VectorExpr
+import hybridrobotics.dynamics.operations.Num
 
 // Scalar Expression
 trait ScalarExpr extends Expression with TimeVarying {
@@ -63,6 +64,21 @@ trait ScalarExpr extends Expression with TimeVarying {
     }
   }
 
+  // is a vector element  in expression vectorExpr
+  def is_member(element: Any): Boolean = {
+    // this function verifies if a given vector is part of a expression
+    this match {
+      // Scalar Expr
+      case Add(a, b) => a.is_member(element) || b.is_member(element)
+      case Mul(a, b) => a.is_member(element) || b.is_member(element)
+      case _ =>
+        if (this == element)
+          return true
+        else
+          return false
+    }
+  }
+
   override def getVariation: ScalarExpr = this.delta()
 
   // (Algebra) Infix operators from high to low using Scala precedence
@@ -77,25 +93,6 @@ trait ScalarExpr extends Expression with TimeVarying {
   // other operations
   override def basicSimplify(): ScalarExpr = {
     this match {
-      //      // Add Numerals
-      //      case Add(NumScalar(number_1), NumScalar(number_2)) => NumScalar(number_1 + number_2)
-      //
-      //      // Remove Zero Numerals
-      //      case Add(scalar_expr, NumScalar(number)) =>
-      //        if (number == 0) scalar_expr.basicSimplify() // Ignore Zero Numeric
-      //        else Add(NumScalar(number), scalar_expr.basicSimplify()) // Change the Add Tree Order
-      //
-      //      case Add(NumScalar(number), scalar_expr) =>
-      //        if (number == 0) scalar_expr.basicSimplify() // Ignore Zero Numeric
-      //        else Add(NumScalar(number), scalar_expr.basicSimplify())
-      //
-      //      // Simplify Individual scalars
-      //      case Add(scalar_expr1, scalar_expr2) => Add(scalar_expr1.basicSimplify(), scalar_expr2.basicSimplify())
-
-
-      // Gather numeric constants in various term structures
-
-
       // Dot product using ZeroVector
       case Dot(vector1, vector2) =>
         if (vector1.isInstanceOf[ZeroVector] || vector2.isInstanceOf[ZeroVector]) NumScalar(0.0)
@@ -129,6 +126,7 @@ trait ScalarExpr extends Expression with TimeVarying {
 
 }
 
+
 //
 // Scalar Types
 //
@@ -141,7 +139,7 @@ trait BaseScalarVariable extends ScalarExpr with Variable {
 
   override def getVariation: ScalarExpr = this.delta()
 
-  override def d: ScalarExpr = VarScalar(this.name+"_d")
+  override def d: ScalarExpr = VarScalar(this.name + "_d")
 }
 
 case class NumScalar(value: Double) extends BaseScalarVariable {
@@ -193,16 +191,22 @@ case class Add(u: ScalarExpr, v: ScalarExpr) extends ScalarExpr {
   // u + v infix
 
   override def basicSimplify(): ScalarExpr = {
-    List(u, v) match {
+    Add(u, v) match {
       // Add Numerals
-      case List(NumScalar(number_1), NumScalar(number_2)) => NumScalar(number_1 + number_2)
+      case Add(NumScalar(number_1), NumScalar(number_2)) => NumScalar(number_1 + number_2)
 
       // Remove Zero Numerals
-      case List(scalar_expr, NumScalar(number)) =>
+      case Add(Mul(a1, NumScalar(d1)), Mul(a2, NumScalar(d2))) =>
+        if (d1 == 0 && d2 == 0)
+          return NumScalar(0.0)
+        else
+          Add(Mul(a1.basicSimplify(), NumScalar(d1)), Mul(a2.basicSimplify(), NumScalar(d2)))
+
+      case Add(scalar_expr, NumScalar(number)) =>
         if (number == 0) scalar_expr.basicSimplify() // Ignore Zero Numeric
         else Add(NumScalar(number), scalar_expr.basicSimplify()) // Change the Add Tree Order
 
-      case List(NumScalar(number), scalar_expr) =>
+      case Add(NumScalar(number), scalar_expr) =>
         if (number == 0) scalar_expr.basicSimplify() // Ignore Zero Numeric
         else Add(NumScalar(number), scalar_expr.basicSimplify())
 
@@ -212,3 +216,22 @@ case class Add(u: ScalarExpr, v: ScalarExpr) extends ScalarExpr {
 
   }
 }
+
+case class Dot(u: VectorExpr, v: VectorExpr) extends ScalarExpr {
+  // u dot v infix
+  override def basicSimplify(): ScalarExpr = {
+    this match {
+      case Dot(u, v) => Dot(u.basicSimplify(), v.basicSimplify())
+      case _ => this
+    }
+  }
+
+  override def is_member(element: Any): Boolean = {
+    this match {
+      case Dot(a, b) => a.is_member(element) || b.is_member(element)
+      case _ => false
+    }
+  }
+
+}
+

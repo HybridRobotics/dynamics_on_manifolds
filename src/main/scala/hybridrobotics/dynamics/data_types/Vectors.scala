@@ -72,6 +72,32 @@ trait VectorExpr extends Expression with TimeVarying {
 
   override def getVariation: VectorExpr = this.delta()
 
+  def replace(exprOld: Any, exprNew: Any): VectorExpr = {
+    this match {
+      // TODO
+      case _ => this
+    }
+  }
+
+  // is a vector element  in expression vectorExpr
+  def is_member(element: Any): Boolean = {
+    // this function verifies if a given vector is part of a expression
+    this match {
+      // Vector Expr
+      case VAdd(a, b) => a.is_member(element) || b.is_member(element)
+      case Cross(a, b) => a.is_member(element) || b.is_member(element)
+      case SMul(a, b) => a.is_member(element) || b.is_member(element)
+      case TransposeVector(v) => v.is_member(element)
+      case MVMul(m, v) => m.is_member(element) || v.is_member(element)
+      // Base case for vectors
+      case _ =>
+        if (this == element)
+          return true
+        else
+          return false
+    }
+  }
+
   //Infix operators
   def x(v: VectorExpr): VectorExpr = Cross(this, v)
 
@@ -88,7 +114,9 @@ trait VectorExpr extends Expression with TimeVarying {
   def T: VectorExpr = TransposeVector(this)
 
   // other functions
-  override def basicSimplify(): VectorExpr = {
+  override def basicSimplify(): VectorExpr
+
+  = {
     this match {
       case _ => this
     }
@@ -126,7 +154,7 @@ case class VAdd(u: VectorExpr, v: VectorExpr) extends VectorExpr {
   override def basicSimplify(): VectorExpr = {
     this match {
       case VAdd(SMul(u, NumScalar(d)), v) =>
-        if (d==0) v.basicSimplify()
+        if (d == 0) v.basicSimplify()
         else VAdd(SMul(u.basicSimplify(), NumScalar(d)), v)
       case VAdd(u, SMul(v, NumScalar(d))) =>
         if (d == 0) u.basicSimplify()
@@ -137,19 +165,15 @@ case class VAdd(u: VectorExpr, v: VectorExpr) extends VectorExpr {
   }
 }
 
-case class Dot(u: VectorExpr, v: VectorExpr) extends ScalarExpr {
-  // u dot v infix
-  override def basicSimplify(): ScalarExpr = {
-    this match {
-      case Dot(u, v) => Dot(u.basicSimplify(), v.basicSimplify())
-      case _ => this
-    }
-  }
-}
-
 case class TransposeVector(v: VectorExpr) extends VectorExpr {
 
   override def T: VectorExpr = this.v
+
+  override def delta(): TransposeVector = {
+    this match {
+      case _ => TransposeVector(v.delta())
+    }
+  }
 
   override def basicSimplify(): VectorExpr = {
     this match {
@@ -160,6 +184,13 @@ case class TransposeVector(v: VectorExpr) extends VectorExpr {
 }
 
 case class VVMul(u: VectorExpr, v: TransposeVector) extends MatrixExpr {
+
+  override def delta(): MatrixExpr = {
+    this match {
+      case _ => VVMul(u.delta(), v) + VVMul(u, v.delta())
+    }
+  }
+
   override def basicSimplify(): MatrixExpr = {
     this match {
       case _ => VVMul(u.basicSimplify(), TransposeVector(v.v.basicSimplify()))
@@ -245,5 +276,7 @@ case class S2(override val name: String) extends BaseVectorVariable with UnitNor
   override def getVariation: VectorExpr = this.getVariationVector
 
   override def d: VectorExpr = S2(this.name + "_d")
+
+  override def T: TransposeVector = TransposeVector(this)
 
 }

@@ -2,7 +2,7 @@ package hybridrobotics.dynamics.examples.variation_linearization
 
 import hybridrobotics.dynamics.data_types._
 import hybridrobotics.dynamics.calculus.MatrixManipulation.extractVariationCoefficients
-import hybridrobotics.dynamics.calculus.PrintLine.{print2LatexFile, printMLatex, printVLatex}
+import hybridrobotics.dynamics.calculus.PrintLine.{variationCoeffs2LatexEquation, print2LatexFile, printMLatex, printVLatex}
 
 object QuadrotorWithLoad {
 
@@ -43,15 +43,7 @@ object QuadrotorWithLoad {
     var list_of_eqns: List[String] = List()
     list_of_eqns = list_of_eqns :+ "Load Position Equation: \\begin{gather}\n" + printVLatex(load_pos) + "=0\n\\end{gather}"
     list_of_eqns = list_of_eqns :+ "Variation load position equation: \\begin{gather}\n" + printVLatex(var_load_pos) + "=0\n\\end{gather}"
-
-    var load_var_eqn_latex: String = "Variation Coefficients extracted\n\\begin{gather}\n"
-    for ((k, v) <- load_pos_coeffs) {
-      val ks: String = printVLatex(k)
-      val vs: String = printMLatex(v)
-      //      list_of_eqns = list_of_eqns :+ "$\\Big[" + vs + "\\Big]" + ks + "$"
-      load_var_eqn_latex = load_var_eqn_latex + "\\Big[" + vs + "\\Big]" + ks + "+\\\\\n"
-    }
-    load_var_eqn_latex = load_var_eqn_latex + "=0\n\\end{gather}"
+    var load_var_eqn_latex: String = variationCoeffs2LatexEquation(load_pos_coeffs)
     list_of_eqns = list_of_eqns :+ load_var_eqn_latex
     print("%s\n", load_var_eqn_latex)
 
@@ -65,17 +57,9 @@ object QuadrotorWithLoad {
     val load_att_coeffs = extractVariationCoefficients(var_load_att, load_var_states)
 
     // Output
-    list_of_eqns = list_of_eqns :+ "Load Attitude Equation: \\begin{gather}\n" + printVLatex(load_pos) + "=0\n\\end{gather}"
-    list_of_eqns = list_of_eqns :+ "Variation load attitude equation: \\begin{gather}\n" + printVLatex(var_load_pos) + "=0\n\\end{gather}"
-
-    var load_att_eqn_latex: String = "Variation Coefficients extracted\n\\begin{gather}\n"
-    for ((k, v) <- load_att_coeffs) {
-      val ks: String = printVLatex(k)
-      val vs: String = printMLatex(v)
-      //      list_of_eqns = list_of_eqns :+ "$\\Big[" + vs + "\\Big]" + ks + "$"
-      load_att_eqn_latex = load_att_eqn_latex + "\\Big[" + vs + "\\Big]" + ks + "+\\\\\n"
-    }
-    load_att_eqn_latex = load_att_eqn_latex + "=0\n\\end{gather}"
+    list_of_eqns = list_of_eqns :+ "Load Attitude Equation: \\begin{gather}\n" + printVLatex(load_att) + "=0\n\\end{gather}"
+    list_of_eqns = list_of_eqns :+ "Variation load attitude equation: \\begin{gather}\n" + printVLatex(var_load_att) + "=0\n\\end{gather}"
+    var load_att_eqn_latex: String = variationCoeffs2LatexEquation(load_att_coeffs)
     list_of_eqns = list_of_eqns :+ load_att_eqn_latex
     print("%s\n", load_att_eqn_latex)
 
@@ -87,18 +71,11 @@ object QuadrotorWithLoad {
     val var_att_states = List(Om.diff().delta(), x.delta(), v.delta(), q.getVariationVector, q.getTangentVector.delta(), R.getVariationVector, R.getTangentVector.delta())
 
     val quad_att_coeffs = extractVariationCoefficients(var_quad_att, var_att_states)
+
     // Output
     list_of_eqns = list_of_eqns :+ "Quad Attitude Equation: \\begin{gather}\n" + printVLatex(quad_att) + "=0\n\\end{gather}"
     list_of_eqns = list_of_eqns :+ "Variation quad attitude equation: \\begin{gather}\n" + printVLatex(var_quad_att) + "=0\n\\end{gather}"
-
-    var quad_att_eqn_latex: String = "Variation Coefficients extracted\n\\begin{gather}\n"
-    for ((k, v) <- quad_att_coeffs) {
-      val ks: String = printVLatex(k)
-      val vs: String = printMLatex(v)
-      //      list_of_eqns = list_of_eqns :+ "$\\Big[" + vs + "\\Big]" + ks + "$"
-      quad_att_eqn_latex = quad_att_eqn_latex + "\\Big[" + vs + "\\Big]" + ks + "+\\\\\n"
-    }
-    quad_att_eqn_latex = quad_att_eqn_latex + "=0\n\\end{gather}"
+    var quad_att_eqn_latex: String = variationCoeffs2LatexEquation(quad_att_coeffs)
     list_of_eqns = list_of_eqns :+ quad_att_eqn_latex
     print("%s\n", quad_att_eqn_latex)
 

@@ -1,7 +1,7 @@
 package hybridrobotics.dynamics.examples.variation_linearization
 
 import hybridrobotics.dynamics.calculus.MatrixManipulation.extractVariationCoefficients
-import hybridrobotics.dynamics.calculus.PrintLine.{print2LatexFile, printMLatex, printVLatex}
+import hybridrobotics.dynamics.calculus.PrintLine.{print2LatexFile, printMLatex, printVLatex, variationCoeffs2LatexEquation}
 import hybridrobotics.dynamics.data_types._
 
 object SphericalPendulum {
@@ -40,23 +40,11 @@ object SphericalPendulum {
     println("ComputationTime:" + (endTime - startTime) / 1000000)
 
     // Output
-    var eqn_latex: String = "$"
-    for ((k, v) <- kinematics_coeff) {
-      val ks: String = printVLatex(k)
-      val vs: String = printMLatex(v)
-      eqn_latex = eqn_latex + "\\Big[" + vs + "\\Big]" + ks + "+"
-    }
-    eqn_latex = eqn_latex + "=0$"
+    var eqn_latex: String = variationCoeffs2LatexEquation(kinematics_coeff)
     print("%s\n", eqn_latex)
     var list_of_eqns: List[String] = List("$" + printVLatex(var_kinematics) + "=0$", eqn_latex)
 
-    var dyn_eqn_latex: String = "$"
-    for ((k, v) <- dynamics_coeff) {
-      val ks: String = printVLatex(k)
-      val vs: String = printMLatex(v)
-      dyn_eqn_latex = dyn_eqn_latex + "\\Big[" + vs + "\\Big]" + ks + "+"
-    }
-    dyn_eqn_latex = dyn_eqn_latex + "=0$"
+    var dyn_eqn_latex: String = variationCoeffs2LatexEquation(dynamics_coeff)
     print("%s\n", dyn_eqn_latex)
     list_of_eqns = list_of_eqns :+ "$" + printVLatex(dynamics) + "=0$"
     list_of_eqns = list_of_eqns :+ "$" + printVLatex(var_dynamics) + "=0$"
@@ -64,9 +52,7 @@ object SphericalPendulum {
 
 
     print2LatexFile(list_of_eqns, filename)
-
     println("Testing done")
-
   }
 
 }

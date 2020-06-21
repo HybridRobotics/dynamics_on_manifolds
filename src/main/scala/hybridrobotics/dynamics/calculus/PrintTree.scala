@@ -2,7 +2,8 @@
 package hybridrobotics.dynamics.calculus
 
 import java.io.{File, PrintWriter}
-import hybridrobotics.dynamics.data_types._
+
+import hybridrobotics.dynamics.data_types.{MatrixExpr, VectorExpr, _}
 import hybridrobotics.dynamics.operations.Collection._
 import hybridrobotics.dynamics.operations.Separation._
 import hybridrobotics.dynamics.operations.Simplification._
@@ -16,7 +17,7 @@ object PrintLine {
     val l = s.length
 
     if (ddt) {
-      s = "\\ddot{" + s.slice(6,l) + "}"
+      s = "\\ddot{" + s.slice(6, l) + "}"
     }
     else if (dt) {
       s = "\\dot{" + s.slice(3, l) + "}"
@@ -60,7 +61,7 @@ object PrintLine {
     case MMul(s, r) => printMLatex(s) + " " + printMLatex(r)
     case VVMul(u, v) => "(" + printVLatex(u) + " " + printVLatex(v) + ")"
     case DeltaM(s) => "\\delta " + printMLatex(s)
-    case TransposeMatrix(s) => "{("+printMLatex(s) + ")}^{T}"
+    case TransposeMatrix(s) => "{(" + printMLatex(s) + ")}^{T}"
     case CrossMap(v) => "{(" + printVLatex(v) + ")}^\\times"
     case _ => "missingMatrixChar"
   }
@@ -74,23 +75,23 @@ object PrintLine {
     case S2(s) => checkSymbols(s)
     case VAdd(u, v) => "(" + printVLatex(u) + "+" + printVLatex(v) + ")"
     case Cross(u, v) => "(" + printVLatex(u) + "\\times " + printVLatex(v) + ")"
-    case SMul(u, v) => printLatex(v) +  printVLatex(u)
+    case SMul(u, v) => printLatex(v) + printVLatex(u)
     case MVMul(u, v) => printMLatex(u) + " " + printVLatex(v)
-    case TransposeVector(v) => "{("+printVLatex(v) + ")}^{T}"
+    case TransposeVector(v) => "{(" + printVLatex(v) + ")}^{T}"
     case ZeroVector(s) => "0"
     case _ => "missingVectorChar"
   }
 
   // Print Scalar to Screen
   def printLatex(e: ScalarExpr): String = e match {
-    case DeltaS(u) => "( \\delta "+ printLatex(u) + ")"
+    case DeltaS(u) => "( \\delta " + printLatex(u) + ")"
     case VarScalar(s) => checkSymbols(s)
     case ConstScalar(s) => checkSymbols(s)
     case NumScalar(d) => "(" + d.toString + ")"
     case Add(u, v) => "(" + printLatex(u) + "+" + printLatex(v) + ")"
     case Mul(DeltaS(u), v) => printLatex(DeltaS(u)) + "* (" + printLatex(v) + ")"
     case Mul(u, v) => printLatex(u) + " " + printLatex(v)
-    case Dot(u, v) => "("+ printVLatex(u) + "\\cdot " + printVLatex(v) + ")"
+    case Dot(u, v) => "\\big((" + printVLatex(u) + ")\\cdot( " + printVLatex(v) + ")\\big)"
     case Par(u) => "(" + printLatex(u) + ")"
     case _ => "missingScalarChar"
   }
@@ -119,7 +120,7 @@ object PrintLine {
     case Cross(u, v) => printVTree(u) + "x" + printVTree(v)
     case SMul(u, v) => printVTree(u) + "*" + printTree(v)
     case MVMul(u, v) => printMTree(u) + "*" + printVTree(v)
-//    case ZVec(s) => s
+    //    case ZVec(s) => s
   }
 
   // Print Scalar to Screen
@@ -131,49 +132,61 @@ object PrintLine {
     case Add(u, v) => printTree(u) + "+" + printTree(v)
     case Mul(DeltaS(u), v) => printTree(DeltaS(u)) + "* (" + printTree(v) + ")"
     case Mul(u, v) => printTree(u) + "*" + printTree(v)
-    case Dot(u, v) => printVTree(u) + "." + "(" + printVTree(v) + ")"
+    case Dot(u, v) => "("+ printVTree(u) + ")\\cdot(" + printVTree(v) + ")"
     case Par(u) => "(" + printTree(u) + ")"
   }
 
 
-//  // Prints set of Equations of Motion
-//  def printEOM(e: ScalarExpr, s: List[ScalarExpr], v: List[VectorExpr]): Tuple3[List[String], List[ScalarExpr], List[VectorExpr]] = {
-//    var eom_latex: List[String] = List()
-//    var piece: ScalarExpr = Num(0)
-//    var counter: Int = 0
-//    var eom_scalar: List[ScalarExpr] = List()
-//    var eom_vector: List[VectorExpr] = List()
-//
-//    // Extracts one equation for each collection term
-//    for (scalar <- s) {
-//      piece = colScalar(e, scalar)
-//      piece = separate(piece, scalar)
-//      val line = simplify(piece)
-//      val finalOutput = removeOneCoefs(line)
-//      eom_latex = eom_latex :+ "Lag" + (counter + 1).toString + ":$" + printLatex(finalOutput) + " = 0$"
-//      eom_scalar = eom_scalar :+ finalOutput
-//      counter = counter + 1
-//    }
-//
-//    // Extracts one equation for each collection term
-//    for (vector <- v) {
-//      piece = col(e, vector)
-//      piece = separateV(piece, vector)
-//      val prep = simplify(piece)
-//
-//      val line = extractAll(prep)
-//
-//      val finalOutput = removeOneCoefsV(line)
-//      eom_latex = eom_latex :+ "Lag" + (counter + 1).toString + ": $" + printVLatex(finalOutput) + " = 0$"
-//      eom_vector = eom_vector :+ finalOutput
-//      counter = counter + 1
-//    }
-//    return Tuple3(eom_latex, eom_scalar, eom_vector)
-//  }
+  //  // Prints set of Equations of Motion
+  //  def printEOM(e: ScalarExpr, s: List[ScalarExpr], v: List[VectorExpr]): Tuple3[List[String], List[ScalarExpr], List[VectorExpr]] = {
+  //    var eom_latex: List[String] = List()
+  //    var piece: ScalarExpr = Num(0)
+  //    var counter: Int = 0
+  //    var eom_scalar: List[ScalarExpr] = List()
+  //    var eom_vector: List[VectorExpr] = List()
+  //
+  //    // Extracts one equation for each collection term
+  //    for (scalar <- s) {
+  //      piece = colScalar(e, scalar)
+  //      piece = separate(piece, scalar)
+  //      val line = simplify(piece)
+  //      val finalOutput = removeOneCoefs(line)
+  //      eom_latex = eom_latex :+ "Lag" + (counter + 1).toString + ":$" + printLatex(finalOutput) + " = 0$"
+  //      eom_scalar = eom_scalar :+ finalOutput
+  //      counter = counter + 1
+  //    }
+  //
+  //    // Extracts one equation for each collection term
+  //    for (vector <- v) {
+  //      piece = col(e, vector)
+  //      piece = separateV(piece, vector)
+  //      val prep = simplify(piece)
+  //
+  //      val line = extractAll(prep)
+  //
+  //      val finalOutput = removeOneCoefsV(line)
+  //      eom_latex = eom_latex :+ "Lag" + (counter + 1).toString + ": $" + printVLatex(finalOutput) + " = 0$"
+  //      eom_vector = eom_vector :+ finalOutput
+  //      counter = counter + 1
+  //    }
+  //    return Tuple3(eom_latex, eom_scalar, eom_vector)
+  //  }
+
+  def variationCoeffs2LatexEquation(coefficients: Map[VectorExpr, MatrixExpr]): String = {
+    var latexEquation: String = "Variation Coefficients extracted\n\\begin{gather}\n"
+    for ((k, v) <- coefficients) {
+      val ks: String = printVLatex(k)
+      val vs: String = printMLatex(v)
+      latexEquation = latexEquation + "\\Big[" + vs + "\\Big]" + ks + "+\\nonumber\\\\\n"
+    }
+    latexEquation = latexEquation + "=0\n\\end{gather}"
+    //    print("%s\n", latexEquation)
+    return latexEquation
+  }
 
   def print2LatexFile(equations: List[String], fileName: String): Unit = {
     val FILE_PATH = new java.io.File(".").getCanonicalPath
-    val writer = new PrintWriter(new File(FILE_PATH + File.separator+ "output"+File.separator + fileName + ".tex"))
+    val writer = new PrintWriter(new File(FILE_PATH + File.separator + "output" + File.separator + fileName + ".tex"))
     writer.write(fileName + ": Equations of Motion\n\\begin{itemize}\n")
     for (str <- equations) {
       writer.write("""\item """ + str + "\n")
