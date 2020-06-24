@@ -3,7 +3,7 @@ package hybridrobotics.dynamics.examples.variation_linearization
 import hybridrobotics.dynamics.data_types._
 import hybridrobotics.dynamics.calculus.MatrixManipulation.extractVariationCoefficients
 import hybridrobotics.dynamics.coder.Latex.{variationCoeffs2LatexEquation, print2LatexFile, printMLatex, printVLatex}
-import hybridrobotics.dynamics.coder.Matlab._
+import hybridrobotics.dynamics.coder._
 
 object PointMass {
 
@@ -19,14 +19,10 @@ object PointMass {
     val equation = SMul(acc, m) - F
     val var_equation = equation.delta()
 
-    val output_variables: (List[ScalarExpr], List[VectorExpr], List[MatrixExpr]) = (List(), List(acc.delta()), List())
-    val state_variables: (List[ScalarExpr], List[VectorExpr], List[MatrixExpr]) = (List(), List(), List())
-    val input_variables: (List[ScalarExpr], List[VectorExpr], List[MatrixExpr]) = (List(), List(F.delta()), List())
+    val out: List[Any] = List(m, F)
 
     // Mergining all the variables
-    val variables = (output_variables._1 ::: state_variables._1 ::: input_variables._1,
-      output_variables._2 ::: state_variables._2 ::: input_variables._2,
-      output_variables._3 ::: state_variables._3 ::: input_variables._3)
+    val variables = (List(), List(acc.delta(), F.delta(), x.delta(), x.diff().delta()), List())
 
     val startTime = System.nanoTime() // track computation time
     val coefficients = extractVariationCoefficients(var_equation, variables)
@@ -34,27 +30,20 @@ object PointMass {
     println("ComputationTime:" + (endTime - startTime) / 1000000)
 
 
+    val output_variables: List[Any] = List(acc.delta())
+    val state_variables: List[Any] = List(x.delta(), x.diff().delta())
+    val input_variables: List[Any] = List(F.delta())
+    val dynamics = Matlab.generateLinearDynamics(List(coefficients), output_variables, state_variables, input_variables)
 
-    //    // Output
-    //    var eqn_latex: String = variationCoeffs2LatexEquation(coefficients)
-    //    print(eqn_latex + "\n")
-    //    val list_of_eqns2print: List[String] = List("$" + printVLatex(equation) + "=0$",
-    //      "$" + printVLatex(var_equation) + "=0$",
-    //      eqn_latex)
-    //
-    //
-    //    var matlabcode : String = ""
-    //    for ((k, v) <- coefficients) {
-    //      val ks: String = vectorExpr2Matlab(k)
-    //      val vs: String = matrixExpr2Matlab(v)
-    //      matlabcode = matlabcode + "["+vs+"]"+ks
-    //    }
-    //    print(matlabcode+"\n")
+
+    // Output
+    var eqn_latex: String = variationCoeffs2LatexEquation(coefficients)
+    print(eqn_latex + "\n")
 
 
     // output function generation
     //    print2LatexFile(list_of_eqns2print, filename)
-    generateMatlabFunction(filename)
+    Matlab.generateMatlabFunction(dynamics, filename)
     println("Testing Done!")
   }
 

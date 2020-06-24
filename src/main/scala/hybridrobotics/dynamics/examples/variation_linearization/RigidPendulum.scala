@@ -1,7 +1,8 @@
 package hybridrobotics.dynamics.examples.variation_linearization
 
 import hybridrobotics.dynamics.calculus.MatrixManipulation.extractVariationCoefficients
-import hybridrobotics.dynamics.coder.Latex.{variationCoeffs2LatexEquation, print2LatexFile, printMLatex, printVLatex}
+import hybridrobotics.dynamics.coder.Latex.{print2LatexFile, printMLatex, printVLatex, variationCoeffs2LatexEquation}
+import hybridrobotics.dynamics.coder.Matlab
 import hybridrobotics.dynamics.data_types._
 
 object RigidPendulum {
@@ -26,21 +27,21 @@ object RigidPendulum {
     val var_equation = equation.delta()
     val variables = List(Om.diff().delta(), Om.delta(), eta, DeltaV(u))
 //
-//    val startTime = System.nanoTime() // track computation time
-//    val coefficients = extractVariationCoefficients(var_equation, variables)
-//    val endTime = System.nanoTime()
-//    println("ComputationTime:" + (endTime - startTime) / 1000000)
-//
-//    // Output
-//    val eqn_latex: String = variationCoeffs2LatexEquation(coefficients)
-//    println("%s", eqn_latex)
-//
-//    var list_of_eqns: List[String] = List("$" + printVLatex(equation) + "=0$",
-//      "$" + printVLatex(var_equation) + "=0$",
-//      eqn_latex)
-//
-//    print2LatexFile(list_of_eqns, filename)
-//    println("Testing Done!")
+    val startTime = System.nanoTime() // track computation time
+    val coefficients = extractVariationCoefficients(var_equation, (List(), variables, List()))
+    val endTime = System.nanoTime()
+    println("ComputationTime:" + (endTime - startTime) / 1000000)
+
+    val output_variables: List[Any] = List(Om.diff().delta())
+    val state_variables: List[Any] = List(eta, Om.delta())
+    val input_variables: List[Any] = List(u.delta())
+    val dynamics = Matlab.generateLinearDynamics(List(coefficients), output_variables, state_variables, input_variables)
+
+
+    // output function generation
+    //    print2LatexFile(list_of_eqns2print, filename)
+    Matlab.generateMatlabFunction(dynamics, filename)
+    println("Testing Done!")
   }
 
 }

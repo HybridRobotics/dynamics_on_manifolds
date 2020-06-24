@@ -3,6 +3,7 @@ package hybridrobotics.dynamics.examples.variation_linearization
 import hybridrobotics.dynamics.data_types._
 import hybridrobotics.dynamics.calculus.MatrixManipulation.extractVariationCoefficients
 import hybridrobotics.dynamics.coder.Latex.{print2LatexFile, printVLatex, variationCoeffs2LatexEquation}
+import hybridrobotics.dynamics.coder.Matlab
 
 object MultipleQuadrotorRigidPayload {
 
@@ -93,12 +94,24 @@ object MultipleQuadrotorRigidPayload {
 //    print(var_A12_eqn_tex+"\n")
 //
 //
-//    var startTime = System.nanoTime() // track computation time
-//    val dyn_eqn1 = lhs_dyn1 - rhs_dyn1
-//    val var_dyn_eqn1 = dyn_eqn1.delta().basicSimplify()
-//    val dyn_eqn1_coeffs = extractVariationCoefficients(var_dyn_eqn1, variables)
-//    var endTime = System.nanoTime()
-//    println("ComputationTime:" + (endTime - startTime) / 1000000)
+    var startTime = System.nanoTime() // track computation time
+    val dyn_eqn1 = lhs_dyn1 - rhs_dyn1
+    val var_dyn_eqn1 = dyn_eqn1.delta().basicSimplify()
+    val coefficients = extractVariationCoefficients(var_dyn_eqn1, (List(), variables, List()))
+    var endTime = System.nanoTime()
+    println("ComputationTime:" + (endTime - startTime) / 1000000)
+
+    val output_variables: List[Any] = List(vL.diff().delta(), OmL.diff().delta())
+    val state_variables: List[Any] = List(OmL.diff().delta(), xii, omi.delta(), etai, etaL, OmL.delta())
+    val input_variables: List[Any] = List()
+    val dynamics = Matlab.generateLinearDynamics(List(coefficients), output_variables, state_variables, input_variables)
+
+
+    // output function generation
+    //    print2LatexFile(list_of_eqns2print, filename)
+    Matlab.generateMatlabFunction(dynamics, filename)
+    println("Testing Done!")
+
 //
 //    // Output
 ////    list_of_eqns = list_of_eqns :+ "Quad Attitude Equation: \\begin{gather}\n" + printVLatex(dyn_eqn1) + "=0\n\\end{gather}"

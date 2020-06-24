@@ -170,9 +170,9 @@ object Latex {
   //    return Tuple3(eom_latex, eom_scalar, eom_vector)
   //  }
 
-  def variationCoeffs2LatexEquation(coefficients: Map[VectorExpr, MatrixExpr]): String = {
+  def variationCoeffs2LatexEquation(coefficients: (Map[ScalarExpr, VectorExpr], Map[VectorExpr, MatrixExpr], Map[MatrixExpr, MatrixExpr]) ): String = {
     var latexEquation: String = "Variation Coefficients extracted\n\\begin{gather}\n"
-    for ((k, v) <- coefficients) {
+    for ((k, v) <- coefficients._2) {
       val ks: String = printVLatex(k)
       val vs: String = printMLatex(v)
       latexEquation = latexEquation + "\\Big[" + vs + "\\Big]" + ks + "+\\nonumber\\\\\n"
