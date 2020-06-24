@@ -1,5 +1,5 @@
 # Symbolic Algebra Package for Computing Symbolic Dynamics on Nonlinear Manifolds
-The package `dynamics_on_manifolds` will compute the dynamical model for a user specified mechanical system. Dynamics are computed on the smooth manifolds `R^3, S^2, SO(3)` and their product spaces, for instance quadrotor with suspended load on `R^3 x S^2 x SO3`. The package also variation linearizes the dynamics to generate [Variation based linearized dynamics](https://hybrid-robotics.berkeley.edu/publications/Access2015_VariationLinearization.pdf). Finally, the package outputs the dynamics as `latex` file and generates a `Matlab` function for the same. 
+The package `dynamics_on_manifolds` will compute the dynamical model for a user specified mechanical system. Dynamics are computed on the smooth manifolds `R^3, S^2, SO(3)` and their product spaces, for instance quadrotor with suspended load on `R^3 x S^2 x SO3`. The package also variation linearizes the dynamics to generate [Variation based linearized dynamics](https://hybrid-robotics.berkeley.edu/publications/Access2015_VariationLinearization.pdf). Finally, the package outputs the dynamics as a `latex` file and generates a `Matlab` function for the same. 
 
 
 ## Citation
@@ -18,6 +18,10 @@ The package `dynamics_on_manifolds` will compute the dynamical model for a user 
       publisher={Springer}
     }
     ```
+
+## Documentation
+
+The documentation is available at [https://github.com/HybridRobotics/dynamics_on_manifolds/wiki](https://github.com/HybridRobotics/dynamics_on_manifolds/wiki). 
 
 ## How to Use
 Please find the detailed documentation on Scala here: [https://docs.scala-lang.org/](https://docs.scala-lang.org/)
@@ -106,7 +110,7 @@ You have now successfully set up your computational environment and are ready fo
 
 ### Generating dynamics for custom mechanical systems
 
--  Full documentation for `dynamics_on_manifold` package can be found in the [wiki](Wiki). 
+-  Full documentation for `dynamics_on_manifold` package can be found in the [https://github.com/HybridRobotics/dynamics_on_manifolds/wiki](https://github.com/HybridRobotics/dynamics_on_manifolds/wiki). 
 
 - Template example for generating nonlinear dynamics is [here](). 
 
