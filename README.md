@@ -1,4 +1,23 @@
 # Symbolic Algebra Package for Computing Symbolic Dynamics on Nonlinear Manifolds
+The package `dynamics_on_manifolds` will compute the dynamical model for a user specified mechanical system. Dynamics are computed on the smooth manifolds `R^3, S^2, SO(3)` and their product spaces, for instance quadrotor with suspended load on `R^3 x S^2 x SO3`. The package also variation linearizes the dynamics to generate [Variation based linearized dynamics](https://hybrid-robotics.berkeley.edu/publications/Access2015_VariationLinearization.pdf). Finally, the package outputs the dynamics as `latex` file and generates a `Matlab` function for the same. 
+
+
+## Citation
+
+- (TODO: ArXiv paper link)
+
+
+- Bittner, Brian, and Koushil Sreenath. "Symbolic computation of dynamics on smooth manifolds." Algorithmic Foundations of Robotics XII. Springer, Cham, 2020. 336-351.
+    ```
+    @incollection{bittner2020symbolic,
+      title={Symbolic computation of dynamics on smooth manifolds},
+      author={Bittner, Brian and Sreenath, Koushil},
+      booktitle={Algorithmic Foundations of Robotics XII},
+      pages={336--351},
+      year={2020},
+      publisher={Springer}
+    }
+    ```
 
 ## How to Use
 Please find the detailed documentation on Scala here: [https://docs.scala-lang.org/](https://docs.scala-lang.org/)
@@ -94,19 +113,3 @@ You have now successfully set up your computational environment and are ready fo
 - Template example for computing variation based linearization dynamics, [link](). 
 
 
-## Citation
-
-- (TODO: ArXiv paper link)
-
-
-- Bittner, Brian, and Koushil Sreenath. "Symbolic computation of dynamics on smooth manifolds." Algorithmic Foundations of Robotics XII. Springer, Cham, 2020. 336-351.
-```
-@incollection{bittner2020symbolic,
-  title={Symbolic computation of dynamics on smooth manifolds},
-  author={Bittner, Brian and Sreenath, Koushil},
-  booktitle={Algorithmic Foundations of Robotics XII},
-  pages={336--351},
-  year={2020},
-  publisher={Springer}
-}
-```
