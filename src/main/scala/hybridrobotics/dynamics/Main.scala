@@ -8,8 +8,7 @@ import hybridrobotics.dynamics.examples._
 // TODO add test cases for DataTypes
 object Main extends App {
 
-  mechanical_systems.SphericalPendulum.main()
-  variation_linearization.RigidPendulum.main()
+  variation_linearization.MultipleQuadrotorRigidPayload.main()
 
 }
 

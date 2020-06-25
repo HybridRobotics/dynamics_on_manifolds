@@ -206,6 +206,28 @@ case class VeeMap(m: MatrixExpr) extends VectorExpr {
   }
 }
 
+case class VectorIterator(vector: VectorExpr) extends VectorExpr with Iterator {
+  val index : String = "i"
+}
+
+
+case class VectorSummation(vector: VectorExpr) extends VectorExpr with Iterator {
+  val index : String = "i"
+  val from:   String = "1"
+  val to:     String = "n"
+
+  override def delta(): VectorExpr = {
+    VectorSummation(vector.delta())
+  }
+  override def diff(): VectorExpr = {
+    VectorSummation(vector.diff())
+  }
+
+  override def basicSimplify(): VectorExpr = {
+    VectorSummation(vector.basicSimplify())
+  }
+}
+
 //
 // Vector Types
 //

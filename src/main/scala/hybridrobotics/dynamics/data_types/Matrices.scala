@@ -214,6 +214,24 @@ case class CrossMap(v: VectorExpr) extends MatrixExpr with SkewSymmetricMatrix {
   }
 }
 
+case class MatrixSummation(matrix: MatrixExpr) extends MatrixExpr with Iterator {
+  val index: String = "i"
+  val from: String = "1"
+  val to: String = "n"
+
+  override def delta(): MatrixExpr = {
+    MatrixSummation(matrix.delta())
+  }
+
+  override def diff(): MatrixExpr = {
+    MatrixSummation(matrix.diff())
+  }
+
+  override def basicSimplify(): MatrixExpr = {
+    MatrixSummation(matrix.basicSimplify())
+  }
+}
+
 //
 // Matrix Types
 //

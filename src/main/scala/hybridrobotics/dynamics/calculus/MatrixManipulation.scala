@@ -8,7 +8,7 @@ object MatrixManipulation {
 
 
   def extractVariationCoefficients(equation: VectorExpr, variables: (List[ScalarExpr], List[VectorExpr], List[MatrixExpr])): (Map[ScalarExpr, VectorExpr], Map[VectorExpr, MatrixExpr], Map[MatrixExpr, MatrixExpr]) = {
-    var eqn = equation.basicSimplify()
+    var  eqn = equation.basicSimplify()
     //    eqn = expandVectorExpr(eqn)
     //    eqn = eqn.basicSimplify()
 

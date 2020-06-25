@@ -20,3 +20,6 @@ trait Expression {
   def basicSimplify(): Any
 }
 
+trait Iterator {
+
+}
