@@ -29,15 +29,15 @@ Please find the detailed documentation on Scala here: [https://docs.scala-lang.o
 Dynamics on Manifolds packages makes use of Scala and sbt (Scala/Simple-Build-Tool). Working with the IntelliJ IDE would be useful in debugging and developing. Find more about IDE [here](https://docs.scala-lang.org/getting-started/intellij-track/getting-started-with-scala-in-intellij.html).  See wiki to find out how to setup the IDE and run the examples. 
 
 ### Scala Installation 
-Using command line, [source](https://docs.scala-lang.org/getting-started/sbt-track/getting-started-with-scala-and-sbt-on-the-command-line.html). The dynamics on manifold package using command line is tested on Ubuntu 18.04 and Windows 10 WSL 2. 
+Using command line, [source](https://docs.scala-lang.org/getting-started/sbt-track/getting-started-with-scala-and-sbt-on-the-command-line.html). The dynamics on manifold package using command line is tested on Ubuntu 18.04 and Windows 10 WSL 2 (Ubuntu 18.04). 
 
 1. Make sure you have the Java 8 JDK (also known as 1.8)
 
     - Run `javac -version` in the command line and make sure you see `javac 1.8.___`
     - If you don’t have version 1.8 or higher, [install the JDK](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html) or try apt install as follows
-    ```
-    $ sudo apt-get install default-jdk
-    ```
+        ```
+        $ sudo apt-get install default-jdk
+        ```
 
 
 2. Install sbt in terminal as follows.
