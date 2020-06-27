@@ -26,17 +26,21 @@ The documentation is available at [https://github.com/HybridRobotics/dynamics_on
 ## How to Use
 Please find the detailed documentation on Scala here: [https://docs.scala-lang.org/](https://docs.scala-lang.org/)
 
-Dynamics on Manifolds packages makes use of Scala and sbt (Scala/Simple-Build-Tool). Working with the IntelliJ IDE would be useful in debugging and developing. Find more about IDE [here](https://docs.scala-lang.org/getting-started/intellij-track/getting-started-with-scala-in-intellij.html).    
+Dynamics on Manifolds packages makes use of Scala and sbt (Scala/Simple-Build-Tool). Working with the IntelliJ IDE would be useful in debugging and developing. Find more about IDE [here](https://docs.scala-lang.org/getting-started/intellij-track/getting-started-with-scala-in-intellij.html).  See wiki to find out how to setup the IDE and run the examples. 
 
-### Scala Installation
+### Scala Installation 
+Using command line, [source](https://docs.scala-lang.org/getting-started/sbt-track/getting-started-with-scala-and-sbt-on-the-command-line.html). The dynamics on manifold package using command line is tested on Ubuntu 18.04 and Windows 10 WSL 2. 
 
-#### Windows
+1. Make sure you have the Java 8 JDK (also known as 1.8)
 
--  TODO
+    - Run `javac -version` in the command line and make sure you see `javac 1.8.___`
+    - If you don’t have version 1.8 or higher, [install the JDK](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html) or try apt install as follows
+    ```
+    $ sudo apt-get install default-jdk
+    ```
 
-#### Ubuntu
-(The dynamics on manifold package is tested on Ubuntu 18.04)
-1. Install sbt in terminal as follows, [source](https://www.scala-sbt.org/1.x/docs/Installing-sbt-on-Linux.html).
+
+2. Install sbt in terminal as follows.
     ```
     echo "deb https://dl.bintray.com/sbt/debian /" | sudo tee -a /etc/apt/sources.list.d/sbt.list
     curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x2EE0EA64E40A89B84B2DF73499E82A75642AC823" | sudo apt-key add
@@ -44,20 +48,13 @@ Dynamics on Manifolds packages makes use of Scala and sbt (Scala/Simple-Build-To
     sudo apt-get install sbt
     ``` 
    
-2. Git clone the git repository
+3. Git clone the git repository
     ```
    $ git clone https://github.com/HybridRobotics/dynamics_on_manifolds.git
    ```
 
 ### Running Examples
-
-#### Windows
-
- - TODO (Makes use of the IntelliJ IDE)
-
-#### Ubuntu 
-
-##### Using command line
+(Using command line)
 
 1.  `cd` into `dynamics_on_manifolds`
     ```
@@ -90,10 +87,6 @@ Dynamics on Manifolds packages makes use of Scala and sbt (Scala/Simple-Build-To
     ```
 5. Matlab and Latex files are saved to `./output/matlab` and `./output/latex` folders respectively. 
 
-##### Using Intellij IDE 
- 
- - Same as Windows instructions
-
 You have now successfully set up your computational environment and are ready for modeling. Located in the dynamics_on_manifolds package (`.src/main/scala/hybridrobotics/dynamics/examples`) are a set of starter files, which involve configuration setups for a variety of mechanical systems. They include:
 
 | Nonlinear dynamics  (`mechanical_systems`)     | Variation based linearization (`variation_linearization`) |
@@ -106,6 +99,7 @@ You have now successfully set up your computational environment and are ready fo
 | `ThreeLinkWalkerFlight.scala`     |  |
 | `QuadrotorWithLoad.scala`         |  |
 | `QuadrotorWithContinuum.scala`    |  |
+
 
 
 ### Generating dynamics for custom mechanical systems
